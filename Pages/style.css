@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Syne-ExtraBold'; 
+    src: url('Assets/Syne-ExtraBold.ttf') format('ttf');
+    font-weight: extra-bold;
+    font-style: normal;
+}
+
 body {
     background-color: #242424;
 }

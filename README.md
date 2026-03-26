@@ -1,6 +1,5 @@
-# CITS3404AgileWebDev
+# Spurdle
 
-This is some information for the README file
-test
+Spurdle is a music guessing game where you input your favourite artists and have to guess a random song of theirs based on numerous hints.
 
-
+## Group Member Information
