@@ -11,7 +11,6 @@
 }
 
 body {
-<<<<<<< HEAD
     background-color: var(--background-black);
 }
 
@@ -29,9 +28,6 @@ h1 {
 #second-half {
     color: var(--neon-green)
 }
-=======
-    background-color: #242424;
-}
 
 .user-auth {
       min-height: 100vh;
@@ -41,4 +37,3 @@ h1 {
       justify-content: center;
       padding: 40px 24px
     }
->>>>>>> f76eb27 (additions to sign-up.html + style.css)
