@@ -1,20 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <title>
-            Spurdle
-        </title>
-        <link rel="stylesheet" href="style.css">
-        <script src="script.js"></script>
-    </head>
-    <body>
-        <h1><span id="first-half">spu</span><span id="second-half">rdle</span></h1>
-        <div class="user-auth">
-            <div>
-                <script>
-                    test();
-                </script>
-            </div>
+  <head>
+    <title>Spurdle</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+  </head>
+
+  <body class="user-auth-page">
+    <h1>
+      <span onclick="goToWelcome()" id="first-half">spu</span
+      ><span onclick="goToWelcome()" id="second-half">rdle</span>
+    </h1>
+      <div class="user-auth-box">
+        <div>
+          <h2>Sign Up Account</h2>
+          <h5>Enter your details below to create your account.</h5>
         </div>
-    </body>
+        <div class="montserrat-white">
+          <div>
+            <label>Username</label>
+            <input type="text" placeholder="Username" />
+          </div>
+          <div>
+            <label>Email</label>
+            <input type="email" placeholder="Email" />
+          </div>
+          <div>
+            <label>Password</label>
+            <input type="password" placeholder="Password" />
+          </div>
+          <div>
+            <label>Confirm Password</label>
+            <input type="password" placeholder="Confirm Password" />
+          </div>
+          <div><button>Sign up</button></div>
+        </div>
+      </div>
+  </body>
 </html>
