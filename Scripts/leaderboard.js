@@ -47,6 +47,16 @@ function getVisiblePlayers() {
   return filteredPlayers;
 }
 
+function getGlobalTopPlayers() {
+  const globalPlayers = [...players];
+
+  globalPlayers.sort(function (a, b) {
+    return b.points - a.points;
+  });
+
+  return globalPlayers;
+}
+
 function updateStats(playerList) {
   if (playerList.length === 0) {
     totalPlayersStat.textContent = "0";
@@ -148,9 +158,10 @@ function updateCards(playerList) {
 
 function renderLeaderboard() {
   const visiblePlayers = getVisiblePlayers();
+  const globalTopPlayers = getGlobalTopPlayers();
 
   updateStats(visiblePlayers);
-  updatePodium(visiblePlayers);
+  updatePodium(globalTopPlayers);
   updatePlayerDetail(visiblePlayers);
   updateTable(visiblePlayers);
   updateCards(visiblePlayers);
