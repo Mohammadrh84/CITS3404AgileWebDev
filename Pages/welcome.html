@@ -8,6 +8,7 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <!-- Import custom configuration (fonts and colours)-->
         <script src="../Scripts/tailwind-config.js"></script>
+        <script src="../Scripts/script.js"></script>
     </head>
 
     <body class="bg-background-black">
@@ -20,7 +21,7 @@
 
             <!--Buttons, should redirect to either signup / login if user isnt logged in-->
             <div class="flex flex-row gap-5 mt-8">
-                    <button class="bg-neon-green text-black px-6 py-3 rounded-lg hover:scale-105 hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
+                    <button class="bg-neon-green text-black px-6 py-3 rounded-lg hover:scale-105 hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200" onclick="goToSignIn()">
                         Start playing
                     </button>
                     <button class="bg-white text-background-black px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-200">
@@ -42,6 +43,5 @@
                         <p>Test how well you really know your favourite artists' music with short song snippets as the first hint.</p>
                     </div>
             </div>
-        </div>
     </body>
 </html>
