@@ -10,3 +10,7 @@ function goToSignIn() {
 function goToSignUp() {
     window.location.href = './sign-up.html';
 }
+
+function goToLeaderboard() {
+    window.location.href = './leaderboard.html';
+}
