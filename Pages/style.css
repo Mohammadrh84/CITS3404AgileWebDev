@@ -4,3 +4,10 @@
     font-weight: 800;
     font-style: normal;
 }
+
+@font-face {
+    font-family: 'Monsterrat'; 
+    src: url('../Assets/Montserrat-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
