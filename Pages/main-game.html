@@ -47,16 +47,13 @@
                         <div class="flex items-center justify-between w-full">
                             <input id="guess-input" type="text" placeholder="Guess a song name..."
                                 class="w-full mr-1 bg-input-gray text-white border border-input-border-gray py-3 px-4 rounded-[28px] placeholder:text-placeholder-gray focus:outline-none focus:ring focus:ring-neon-green focus:ring-opacity-30 focus:border-neon-green">
-                            <button id="guess-button"
+                            <button id="guess-button" onclick=""
                                 class="bg-[#3dff6e38] text-[#3dff6e]border border-white/10 py-3 px-4 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-20">
                                 Guess
                             </button>
                         </div>
                     </section>
                     <div id="guess-feedback-container"></div>
-                    <!-- <p id="guess-feedback" class="mt-1 text-sm text-[#ff4a6e] rounded-full border border-[#ff4a6e]/50 bg-[#ff4a6e1f] py-2 px-4 ">wrong 1</p>
-                    <p id="guess-feedback" class="mt-1 text-sm text-[#ff4a6e] rounded-full border border-[#ff4a6e]/50 bg-[#ff4a6e1f] py-2 px-4 ">wrong 2</p>
-                    <p id="guess-feedback" class="mt-1 text-sm text-[#ff4a6e] rounded-full bg-neon-green/5 text-neon-green border border-neon-green/20 py-2 px-4 ">Correct!</p> -->
                     <div>
                         <pre id="result"></pre>
                     </div>
@@ -159,7 +156,7 @@
                     </section>
                     <!-- HINT 3 Revealed-->
                     <section id="section-3-hint"
-                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6 ">
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6 hidden">
                         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">letter reveal</p>
@@ -203,13 +200,28 @@
                         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
 
                             <div class="flex items-center justify-between  w-full">
-                                <p class="text-xs uppercase tracking-[0.35em] text-white">Album cover</p>
+                                <p class="text-xs uppercase tracking-[0.35em] text-white">Album name</p>
                                 <div class="rounded-full border border-[#ff4a6e]/50 bg-[#ff4a6e1f] p-2">
                                     <p id="album-cover-revealed"
                                         class="text-xs uppercase tracking-[0.35em] text-[#ff4a6e] px-2">Not revealed</p>
                                 </div>
 
                             </div>
+
+                        </div>
+                    </section>
+                    <!-- HINT 4 Revealed-->
+                    <section id="section-1-hint"
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6 hidden">
+                        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                            <div class="flex items-center justify-between w-full">
+                                <p class="text-xs uppercase tracking-[0.35em] text-white">Album name</p>
+                                <div class="rounded-full border border border-neon-green/20 bg-neon-green/5 p-2">
+                                    <p id="artist-name-revealed"
+                                        class="text-xs uppercase tracking-[0.35em] text-neon-green  px-2">revealed</p>
+                                </div>
+                            </div>
+                            <span class="text-xs uppercase tracking-[0.35em] text-neon-green" id="album-name"></span>
 
                         </div>
                     </section>

@@ -84,6 +84,7 @@ async function GetRandomSong() {
         year: 'numeric'
     });
     document.getElementById('album-cover').src = songDeets.AlbumCover;
+    document.getElementById('album-name').textContent = songDeets.albumName;
 
     GetArtistImage(randomArtistName).then(imageUrl => {
         document.getElementById('artist-image').src = imageUrl;
