@@ -66,7 +66,8 @@ async function GetRandomSong() {
         trackName: randomSong.trackName,
         releaseDate: randomSong.releaseDate,
         genre: randomSong.primaryGenreName,
-        previewUrl: randomSong.previewUrl,
+        SongPreview: randomSong.previewUrl,
+        AlbumCover: randomSong.artworkUrl100,
     };
     cacheSongDeets = songDeets;
 
@@ -78,6 +79,7 @@ async function GetRandomSong() {
         month: 'long',
         year: 'numeric'
     });
+    document.getElementById('album-cover').src = songDeets.AlbumCover;
 
     GetArtistImage(randomArtistName).then(imageUrl => {
         document.getElementById('artist-image').src = imageUrl;
