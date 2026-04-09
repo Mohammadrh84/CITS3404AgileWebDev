@@ -6,6 +6,7 @@ let cacheSongDeets = null;
 let lettersInSong = [];
 let lettersCorrect = [];
 let lettersWrong = [];
+let snippetStartTime = 0;
 
 async function GetArtistIdName(artistName) {
     const searchForArtistUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=musicArtist&limit=1`;
@@ -50,8 +51,7 @@ async function GetArtistImage(randomArtistName) {
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
-    const test = await GetRandomSong();
-    console.log("Random song fetched on page load:", test);
+        await GetRandomSong();
     } catch (error) {
         console.error("Error occurred while fetching random song:", error);
 }
@@ -73,7 +73,7 @@ async function GetRandomSong() {
         AlbumCover: randomSong.artworkUrl100,
     };
     cacheSongDeets = songDeets;
-
+    snippetStartTime = Math.floor(Math.random() * (28));
     document.getElementById('result').textContent = JSON.stringify(songDeets, null, 2);
     document.getElementById('artist-name').textContent = songDeets.artistName;
 
@@ -179,4 +179,15 @@ async function checkLetters() {
             }
         }
     }
+}
+
+async function playSnippet() {
+    const audio = new Audio(cacheSongDeets.SongPreview);
+    
+    audio.currentTime = snippetStartTime;
+    audio.play();
+
+    setTimeout(() => {
+        audio.pause();
+    }, 2000);
 }

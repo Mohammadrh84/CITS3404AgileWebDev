@@ -16,13 +16,13 @@
 <!-- Main game -->
 
 <body class="bg-background-black backdrop-blur-[100px] bg-cover bg-center bg-no-repeat">
-    <main class="min-h-screen px-4 py-6 md:px-8 lg:px-12">
+    <main class="min-h-screen p-4">
         <div class="mx-auto max-w-6xl">
             <section class="mt-6 grid gap-4 md:grid-cols-2">
                 <!-- GUESSING SECTION -->
                 <div class="bg-card-black rounded-[24px] border border-white/10 bg-white/5 p-5 ">
                     <!-- POINTS HEADER-->
-                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-4 md:p-6">
+                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6">
                         <div class="flex flex-col ">
                             <div class="w-full">
                                 <div class="flex items-center justify-between w-full">
@@ -30,10 +30,9 @@
                                     <p class="text-sm font-bold uppercase tracking-[0.35em] text-neon-green/80">100</p>
                                 </div>
                             </div>
-                            <!-- <div class="grid gap-3 md:hidden"></div> -->
                     </section>
                     <!-- ARTIST INFO -->
-                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] md:p-4">
+                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-4">
                         <div class="flex items-center justify-between w-full">
                             <p class="text-sm uppercase tracking-[0.35em] text-white/80">
                                 Artist:<br>
@@ -43,12 +42,12 @@
                                 class="w-2/5 h-2/5 rounded-xl object-cover shrink-0">
                         </div>
                     </section>
-                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] md:p-4">
+                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-4">
                         <div class="flex items-center justify-between w-full">
                             <input id="guess-input" type="text" placeholder="Guess a song name..."
                                 class="w-full mr-1 bg-input-gray text-white border border-input-border-gray py-3 px-4 rounded-[28px] placeholder:text-placeholder-gray focus:outline-none focus:ring focus:ring-neon-green focus:ring-opacity-30 focus:border-neon-green">
                             <button id="guess-button" onclick=""
-                                class="bg-[#3dff6e38] text-[#3dff6e]border border-white/10 py-3 px-4 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-20">
+                                class="bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-4 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-20">
                                 Guess
                             </button>
                         </div>
@@ -66,7 +65,7 @@
                             <div>
                                 <div class="flex items-center justify-between w-full">
                                     <p class="text-sm uppercase tracking-[0.35em] text-neon-green/80">Hint</p>
-                                    <span id="hints-revealed" class="text-sm font-bold uppercase tracking-[0.35em] text-neon-green/80"></span>
+                                    <span id="hints-revealed" class="text-sm font-bold uppercase tracking-[0.35em] text-neon-green/80">0 / 5 Revealed</span>
                                 </div>
                                 <p id="hint-description"
                                     class="mt-4 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
@@ -91,7 +90,7 @@
                     </section>
                     <!-- HINT 1 Revealed-->
                     <section id="section-1-hint"
-                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6 hidden">
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
                         <div class="flex flex-col gap-4 ">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">Release date</p>
@@ -231,6 +230,27 @@
                                         class="text-xs uppercase tracking-[0.35em] text-[#ff4a6e] px-2">Not revealed</p>
                                 </div>
 
+                            </div>
+
+                        </div>
+                    </section>
+                    <!-- HINT 5 Revealed-->
+                    <section id="section-5-hint" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
+                        <div class="flex flex-col gap-4 ">
+                            <div class="flex items-center justify-between w-full">
+                                <p class="text-xs uppercase tracking-[0.35em] text-white">Album name</p>
+                                <div class="rounded-full border border border-neon-green/20 bg-neon-green/5 p-2">
+                                    <p id="artist-name-revealed"
+                                        class="text-xs uppercase tracking-[0.35em] text-neon-green  px-2">revealed</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-center w-full mt-4">
+                                <button id="play-snippet-button" onclick="playSnippet()"
+                                
+                                class="flex items-center gap-3 bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-6 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
+                                    <span id="play-label" class="text-xs uppercase tracking-[0.35em]">▶ Play snippet</span>
+                                </button>
                             </div>
 
                         </div>
