@@ -77,15 +77,29 @@
                             </div>
                     </section>
                     <!-- HINT 1-->
-                    <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6 ">
+                    <section id="section-1-hidden" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6">
                         <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                             <div class="flex items-center justify-between w-full">
-                                <p class="text-xs uppercase tracking-[0.35em] text-white">Artist</p>
+                                <p class="text-xs uppercase tracking-[0.35em] text-white">Release date</p>
                                 <div class="rounded-full border border-[#ff4a6e]/50 bg-[#ff4a6e1f] p-2">
                                     <p id="artist-name-revealed"
                                         class="text-xs uppercase tracking-[0.35em] text-[#ff4a6e] px-2">Not revealed</p>
                                 </div>
                             </div>
+
+                        </div>
+                    </section>
+                    <!-- HINT 1 Revealed-->
+                    <section id="section-1-hint" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] py-2 px-4 md:p-6 hidden">
+                        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                            <div class="flex items-center justify-between w-full">
+                                <p class="text-xs uppercase tracking-[0.35em] text-white">Release date</p>
+                                <div class="rounded-full border border border-neon-green/20 bg-neon-green/5 p-2">
+                                    <p id="artist-name-revealed"
+                                        class="text-xs uppercase tracking-[0.35em] text-neon-green  px-2">revealed</p>
+                                </div>
+                            </div>
+                            <span class="text-xs uppercase tracking-[0.35em] text-neon-green" id="release-date"></span>
 
                         </div>
                     </section>
@@ -150,7 +164,7 @@
                         </div>
                     </section>
                     <section>
-                        <button
+                        <button onclick="NextHint()"
                             class="mt-4 w-full bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-4 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-20">
                             <!-- class="mt-4 w-full bg-[#3dff6e38] text-[#3dff6e] border border-neon-green/10 py-3 px-4 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-20"> -->
                             Reveal Hint

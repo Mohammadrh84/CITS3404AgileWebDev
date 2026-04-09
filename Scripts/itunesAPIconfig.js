@@ -73,6 +73,11 @@ async function GetRandomSong() {
     console.log("Random song details:", songDeets);
     document.getElementById('result').textContent = JSON.stringify(songDeets, null, 2);
     document.getElementById('artist-name').textContent = songDeets.artistName;
+    document.getElementById('release-date').textContent = new Date(songDeets.releaseDate).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
 
     GetArtistImage(randomArtistName).then(imageUrl => {
         document.getElementById('artist-image').src = imageUrl;
@@ -117,3 +122,21 @@ document.getElementById('guess-button').addEventListener('click', async function
     container.appendChild(p);
     document.getElementById('guess-input').value = "";
 });
+
+const hintSections = [
+    { hidden: document.getElementById('section-1-hidden'), hint: document.getElementById('section-1-hint') },
+    { hidden: document.getElementById('section-2-hidden'), hint: document.getElementById('section-2-hint') },
+    { hidden: document.getElementById('section-3-hidden'), hint: document.getElementById('section-3-hint') },
+    { hidden: document.getElementById('section-4-hidden'), hint: document.getElementById('section-4-hint') },
+    { hidden: document.getElementById('section-5-hidden'), hint: document.getElementById('section-5-hint') },
+];
+
+let currentHint = 0;
+
+function NextHint() {
+    if (currentHint >= 5) return;
+
+    hintSections[currentHint].hidden.classList.add('hidden');
+    hintSections[currentHint].hint.classList.remove('hidden');
+    currentHint++;
+}
