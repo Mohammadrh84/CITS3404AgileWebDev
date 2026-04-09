@@ -74,7 +74,6 @@ async function GetRandomSong() {
     };
     cacheSongDeets = songDeets;
     snippetStartTime = Math.floor(Math.random() * (28));
-    document.getElementById('result').textContent = JSON.stringify(songDeets, null, 2);
     document.getElementById('artist-name').textContent = songDeets.artistName;
 
     //HINTS
@@ -127,6 +126,7 @@ document.getElementById('guess-button').addEventListener('click', async function
     if (result) {
         p.textContent = "✓  " + userGuess;
         p.className = "mt-1 text-sm rounded-full py-2 px-4 text-neon-green bg-neon-green/5 border border-neon-green/20";
+        //console.log("Correct guess!");
     } else {
         p.textContent = "✕  " + userGuess;
         p.className = "mt-1 text-sm rounded-full py-2 px-4 text-[#ff4a6e] border border-[#ff4a6e]/50 bg-[#ff4a6e1f]";
