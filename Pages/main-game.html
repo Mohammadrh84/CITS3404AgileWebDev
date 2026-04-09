@@ -16,6 +16,19 @@
 <!-- Main game -->
 
 <body class="bg-background-black backdrop-blur-[100px] bg-cover bg-center bg-no-repeat">
+    <nav class="flex items-center justify-between px-8 border-b border-white/10">
+        <h1 class="font-syne text-[35px] text-white cursor-pointer">
+        <span onclick="goToWelcome()" class="text-white">spu</span
+        ><span onclick="goToWelcome()" class="text-neon-green">rdle</span>
+        </h1>
+        <div class="flex items-center gap-6 font-semibold text-sm">
+            <a href="leaderboard.html" class="text-white transition hover:text-neon-green">Leaderboard</a>
+            <a href="#" class="text-white transition hover:text-neon-green">My Account</a>
+            <a href="#" class="rounded-full bg-neon-green px-4 py-2 text-black transition hover:scale-105">
+            Artist Select
+            </a>
+        </div>
+    </nav>
     <main class="min-h-screen p-4">
         <div class="mx-auto max-w-6xl">
             <section class="mt-6 grid gap-4 md:grid-cols-2">
@@ -55,9 +68,6 @@
                     </section>
                     <!-- GUESS CHECK -->
                     <div id="guess-feedback-container"></div>
-                    <div>
-                        <pre id="result"></pre>
-                    </div>
                 </div>
                 <!-- HINT SECTION -->
                 <div class="bg-card-black rounded-[24px] border border-white/10 bg-white/5 p-5 ">
