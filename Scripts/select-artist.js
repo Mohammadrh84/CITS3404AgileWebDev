@@ -113,3 +113,37 @@ function renderSearchResults(results) {
         });
     });
 }
+
+function renderSelectedArtists() {
+    selectedArtists.innerHTML = "";
+
+    if (chosenArtists.length === 0) {
+        selectedArtists.innerHTML = `<p class="text-white/60 text-lg">No artists selected yet.</p>`;
+        return;
+    }
+
+    chosenArtists.forEach((artist, index) => {
+        const card = document.createElement("div");
+        card.className = "bg-white text-black rounded-3xl p-4 flex items-center justify-between gap-4";
+
+        card.innerHTML = `
+          <div class="flex items-center gap-4">
+            <img src="${artist.image}" alt="${artist.name}" class="w-14 h-14 rounded-2xl object-cover bg-gray-200">
+            <span class="text-2xl font-bold">${artist.name}</span>
+          </div>
+          <button class="text-xl font-bold px-3 py-1 rounded-full bg-black text-white hover:scale-105 transition-transform duration-200">
+            ×
+          </button>
+        `;
+
+        // logic for removing artists
+        card.querySelector("button").addEventListener("click", () => {
+            chosenArtists.splice(index, 1);
+            renderSelectedArtists();
+            updateStartButton();
+            if(artistSearch.value.trim()) searchArtistsFromAPI(artistSearch.value.trim()); 
+        });
+
+        selectedArtists.appendChild(card);
+    });
+}
