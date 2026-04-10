@@ -285,16 +285,18 @@
             </section>
         </div>
     </main>
-    <!-- USER WON -->
+    <!-- RESULTS OVERLAY -->
     <div id="result-overlay"
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
-        <div class="bg-card-black border border-white/10 rounded-[28px] p-8 max-w-lg w-full mx-4 text-center">
+        <div class="bg-card-black border border-white/10 rounded-[28px] p-8 max-w-lg w-full mx-4 text-center ">
+            <!-- FEEDBACK MESSAGE -->
             <h2 id="overlay-title" class="text-3xl font-bold text-white mb-2"></h2>
             <p id="overlay-subtitle" class="text-white/70 text-sm mt-2 mb-6"></p>
 
+            <!-- ARTIST DETAILS -->
             <section class="mb-3 rounded-[28px] border border-white/10 bg-[#131318] p-4">
-                <div class="flex items-center justify-between w-full">
-                    <p class="text-sm uppercase tracking-[0.35em] text-white/80">
+                <div class="flex items-center justify-center gap-6 w-full">
+                    <p class="text-sm uppercase tracking-[0.35em] text-white/80 text-center">
                         Artist:<br>
                         <span id="artist-name-results" class="text-sm font-bold text-neon-green/80"></span><br><br>
                         Song:<br>
