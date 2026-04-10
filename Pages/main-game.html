@@ -15,17 +15,17 @@
 
 <!-- Main game -->
 
-<body class="bg-background-black backdrop-blur-[100px] bg-cover bg-center bg-no-repeat">
+<body class="bg-background-black bg-cover bg-center bg-no-repeat">
     <nav class="flex items-center justify-between px-8 border-b border-white/10">
         <h1 class="font-syne text-[35px] text-white cursor-pointer">
-        <span onclick="goToWelcome()" class="text-white">spu</span
-        ><span onclick="goToWelcome()" class="text-neon-green">rdle</span>
+            <span onclick="goToWelcome()" class="text-white">spu</span><span onclick="goToWelcome()"
+                class="text-neon-green">rdle</span>
         </h1>
         <div class="flex items-center gap-6 font-semibold text-sm">
             <a href="leaderboard.html" class="text-white transition hover:text-neon-green">Leaderboard</a>
             <a href="#" class="text-white transition hover:text-neon-green">My Account</a>
             <a href="#" class="rounded-full bg-neon-green px-4 py-2 text-black transition hover:scale-105">
-            Artist Select
+                Artist Select
             </a>
         </div>
     </nav>
@@ -58,9 +58,9 @@
                     <!-- GUESSING -->
                     <section class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-4">
                         <div class="flex items-center justify-between w-full">
-                            <input id="guess-input" type="text" placeholder="Guess a song name..." 
+                            <input id="guess-input" type="text" placeholder="Guess a song name..."
                                 class="w-full mr-1 bg-input-gray text-white border border-input-border-gray py-3 px-4 rounded-[28px] placeholder:text-placeholder-gray focus:outline-none focus:ring focus:ring-neon-green focus:ring-opacity-30 focus:border-neon-green">
-                            <button id="guess-button" 
+                            <button id="guess-button"
                                 class="bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-4 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-20">
                                 Guess
                             </button>
@@ -77,7 +77,9 @@
                             <div>
                                 <div class="flex items-center justify-between w-full">
                                     <p class="text-sm uppercase tracking-[0.35em] text-neon-green/80">Hint</p>
-                                    <span id="hints-revealed" class="text-sm font-bold uppercase tracking-[0.35em] text-neon-green/80">0 / 5 Revealed</span>
+                                    <span id="hints-revealed"
+                                        class="text-sm font-bold uppercase tracking-[0.35em] text-neon-green/80">0 / 5
+                                        Revealed</span>
                                 </div>
                                 <p id="hint-description"
                                     class="mt-4 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
@@ -87,8 +89,7 @@
                             </div>
                     </section>
                     <!-- HINT 1-->
-                    <section id="section-1-hidden"
-                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6">
+                    <section id="section-1-hidden" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6">
                         <div class="flex flex-col gap-4 ">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">Release date</p>
@@ -131,7 +132,8 @@
                         </div>
                     </section>
                     <!-- HINT 2 Revealed-->
-                    <section id="section-2-hint" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
+                    <section id="section-2-hint"
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
                         <div class="flex flex-col gap-4">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">Album cover</p>
@@ -163,12 +165,14 @@
                         </div>
                     </section>
                     <!-- HINT 3 Revealed-->
-                    <section id="section-3-hint" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
+                    <section id="section-3-hint"
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
                         <div class="flex flex-col gap-4 ">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">letter reveal</p>
                                 <div class="rounded-full border border border-neon-green/20 bg-neon-green/5 p-2">
-                                    <p id="artist-name-revealed" class="text-xs uppercase tracking-[0.35em] text-neon-green  px-2">revealed</p>
+                                    <p id="artist-name-revealed"
+                                        class="text-xs uppercase tracking-[0.35em] text-neon-green  px-2">revealed</p>
                                 </div>
                             </div>
                             <div class="grid grid-cols-6 place-items-center justify-center w-full">
@@ -218,7 +222,8 @@
                         </div>
                     </section>
                     <!-- HINT 4 Revealed-->
-                    <section id="section-4-hint" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
+                    <section id="section-4-hint"
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
                         <div class="flex flex-col gap-4 ">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">Album name</p>
@@ -247,7 +252,8 @@
                         </div>
                     </section>
                     <!-- HINT 5 Revealed-->
-                    <section id="section-5-hint" class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
+                    <section id="section-5-hint"
+                        class="mt-1 rounded-[28px] border border-white/10 bg-[#131318] p-6 hidden">
                         <div class="flex flex-col gap-4 ">
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-xs uppercase tracking-[0.35em] text-white">Album name</p>
@@ -258,9 +264,9 @@
                             </div>
                             <div class="flex items-center justify-center w-full mt-4">
                                 <button id="play-snippet-button" onclick="playSnippet()"
-                                
-                                class="flex items-center gap-3 bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-6 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
-                                    <span id="play-label" class="text-xs uppercase tracking-[0.35em]">▶ Play snippet</span>
+                                    class="flex items-center gap-3 bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-6 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
+                                    <span id="play-label" class="text-xs uppercase tracking-[0.35em]">▶ Play
+                                        snippet</span>
                                 </button>
                             </div>
 
@@ -272,9 +278,44 @@
                             Reveal Hint
                         </button>
                     </section>
-                    <a class="mt-2 mr-2 text-white/70 float-right hover:underline">Give up?</a>
+                    <a onclick="showResultsOverlay(false)"
+                        class="mt-2 mr-2 text-white/70 float-right hover:underline cursor-pointer">Give up?</a>
                 </div>
+            
+            </section>
+        </div>
     </main>
+    <!-- USER WON -->
+    <div id="result-overlay"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden">
+        <div class="bg-card-black border border-white/10 rounded-[28px] p-8 max-w-lg w-full mx-4 text-center">
+            <h2 id="overlay-title" class="text-3xl font-bold text-white mb-2"></h2>
+            <p id="overlay-subtitle" class="text-white/70 text-sm mt-2 mb-6"></p>
+
+            <section class="mb-3 rounded-[28px] border border-white/10 bg-[#131318] p-4">
+                <div class="flex items-center justify-between w-full">
+                    <p class="text-sm uppercase tracking-[0.35em] text-white/80">
+                        Artist:<br>
+                        <span id="artist-name-results" class="text-sm font-bold text-neon-green/80"></span><br><br>
+                        Song:<br>
+                        <span id="song-name-results" class="text-sm font-bold text-neon-green/80"></span>
+                    </p>
+                    <img id="artist-image-result" src="" alt="Artist"
+                        class="w-2/5 h-2/5 rounded-xl object-cover shrink-0">
+                </div>
+            </section>
+
+            <!-- BUTTONS -->
+            <button onclick="#"
+                class="bg-white/5 text-white border border-white/20 py-3 px-6 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
+                Select Artists
+            </button>
+            <button onclick="playAgain()"
+                class="bg-neon-green/5 text-neon-green border border-neon-green/20 py-3 px-6 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
+                Play Again
+            </button>
+        </div>
+    </div>
 </body>
 
 </html>

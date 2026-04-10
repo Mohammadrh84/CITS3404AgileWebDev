@@ -7,6 +7,7 @@ let lettersInSong = [];
 let lettersCorrect = [];
 let lettersWrong = [];
 let snippetStartTime = 0;
+let cacheArtistImage = null;
 
 async function GetArtistIdName(artistName) {
     const searchForArtistUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=musicArtist&limit=1`;
@@ -40,14 +41,13 @@ async function GetArtistImage(randomArtistName) {
         const url = `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(randomArtistName)}`;
         const res = await fetch(url);
         const data = await res.json();
+        cacheArtistImage = data.artists?.[0]?.strArtistThumb ?? "";
         return data.artists?.[0]?.strArtistThumb ?? "";
     } catch (err) {
         console.error("Failed to fetch artist image:", err);
         return "";
     }
 }
-
-
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
@@ -135,6 +135,7 @@ document.getElementById('guess-button').addEventListener('click', async function
     if (result) {
         p.textContent = "✓  " + userGuess;
         p.className = "mt-1 text-sm rounded-full py-2 px-4 text-neon-green bg-neon-green/5 border border-neon-green/20";
+        showResultsOverlay(true);
     } else {
         p.textContent = "✕  " + userGuess;
         p.className = "mt-1 text-sm rounded-full py-2 px-4 text-[#ff4a6e] border border-[#ff4a6e]/50 bg-[#ff4a6e1f]";
@@ -204,4 +205,28 @@ async function playSnippet() {
     setTimeout(() => {
         audio.pause();
     }, 2000);
+}
+
+async function showResultsOverlay(results) {
+    const overlay = document.getElementById('result-overlay');
+    const overlayTitle = document.getElementById('overlay-title');
+    const overlaySubTitle = document.getElementById('overlay-subtitle');
+    
+    document.getElementById('artist-image-result').src = cacheArtistImage;
+    document.getElementById('artist-name-results').textContent = cacheArtistName;
+    document.getElementById('song-name-results').textContent = cacheSongDeets.trackName;
+    if (results) {
+        overlayTitle.textContent = "You did it!";
+        overlaySubTitle.textContent = "Play again and see if you can get a streak going!";
+    } else {
+        overlayTitle.textContent = "Oops! Dont worry you cant win them all.";
+        overlaySubTitle.textContent = "Try again, you got the next one!";
+    }
+
+    overlay.classList.remove('hidden');
+}
+
+async function playAgain() {
+    document.getElementById('result-overlay').classList.add('hidden');
+    location.reload();
 }
