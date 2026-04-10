@@ -144,6 +144,12 @@ document.getElementById('guess-button').addEventListener('click', async function
     document.getElementById('guess-input').value = "";
 });
 
+document.getElementById('guess-input').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        document.getElementById('guess-button').click();
+    }
+});
+
 const hintSections = [
     { hidden: document.getElementById('section-1-hidden'), hint: document.getElementById('section-1-hint') },
     { hidden: document.getElementById('section-2-hidden'), hint: document.getElementById('section-2-hint') },
