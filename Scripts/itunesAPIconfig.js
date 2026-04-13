@@ -2,6 +2,7 @@ let cacheArtistID = null;
 let cacheArtistName = null;
 const listOfArtists = ["Taylor swift", "Ed Sheeran", "Adele", "Drake", "Beyoncé", "The Weeknd", "Billie Eilish", "Bruno Mars", "Ariana Grande", "Justin Bieber"];
 let listOfSongs = [];
+let listOfSongNames = [];
 let cacheSongDeets = null;
 let lettersInSong = [];
 let lettersCorrect = [];
@@ -22,8 +23,10 @@ async function filterSongs(SongsInJSON, randomArtist) {
     for (let i = 0; i < SongsInJSON.length; i++) {
         if (SongsInJSON[i].artistId === randomArtist && SongsInJSON[i].wrapperType === "track") {
             listOfSongs.push(SongsInJSON[i]);
+            listOfSongNames.push(SongsInJSON[i].trackName);
         }
     }
+    console.log(listOfSongNames);
 }
 async function GetArtistSongs(randomArtist) {
     const searchArtistsSongsUrl = `https://itunes.apple.com/lookup?id=${encodeURIComponent(randomArtist)}&entity=song&limit=200`;
@@ -235,18 +238,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const guessInput = document.getElementById('guess-input');
     const suggestionsList = document.getElementById('suggestions-list');
 
-    // hardcoded list of songs for testing as current song list is not working
-    const testSongs = [
-        "Shake It Off",
-        "Shape of You",
-        "Someone Like You",
-        "Save Your Tears",
-        "Starboy",
-        "Bad Guy",
-        "Blinding Lights",
-        "Blank Space"
-    ];
-
     // check for input and conver to lowercase
     guessInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
@@ -259,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // filter the list based on what user has typed, not case sensitive
-        const matches = testSongs.filter(song => song.toLowerCase().includes(query));
+        const matches = listOfSongNames.filter(song => song.toLowerCase().includes(query));
 
         // if there are any matches display them
         if (matches.length > 0) {
