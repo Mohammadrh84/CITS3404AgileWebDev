@@ -26,7 +26,7 @@ async function filterSongs(SongsInJSON, randomArtist) {
             listOfSongNames.push(SongsInJSON[i].trackName);
         }
     }
-    console.log(listOfSongNames);
+    console.log(listOfSongs);
 }
 async function GetArtistSongs(randomArtist) {
     const searchArtistsSongsUrl = `https://itunes.apple.com/lookup?id=${encodeURIComponent(randomArtist)}&entity=song&limit=200`;
