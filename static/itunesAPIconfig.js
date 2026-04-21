@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 async function GetRandomSong() {
-    const res = await fetch('/api/random-song?artist=Frank Ocean');
+    const res = await fetch('/api/random-song?artist=Kanye West');
     const songDeets = await res.json();
 
     cacheSongDeets = {

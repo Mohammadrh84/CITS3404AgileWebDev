@@ -10,7 +10,7 @@ def home():
 
 @app.route('/api/random-song')
 def random_song():
-    artist_name = request.args.get('artist', 'Frank Ocean')
+    artist_name = request.args.get('artist', 'Kanye West')
 
     # Get artist ID
     search_url = f"https://itunes.apple.com/search?term={artist_name}&entity=musicArtist&limit=1"
