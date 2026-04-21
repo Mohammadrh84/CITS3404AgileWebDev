@@ -1,6 +1,6 @@
 let cacheArtistID = null;
 let cacheArtistName = null;
-const listOfArtists = ["Frank Ocean"];
+const listOfArtists = ["Kanye West"];
 let listOfSongs = [];
 let listOfSongNames = [];
 let cacheSongDeets = null;
