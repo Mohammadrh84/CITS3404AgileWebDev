@@ -1,6 +1,6 @@
 let cacheArtistID = null;
 let cacheArtistName = null;
-const listOfArtists = ["Taylor swift", "Ed Sheeran", "Adele", "Drake", "Beyoncé", "The Weeknd", "Billie Eilish", "Bruno Mars", "Ariana Grande", "Justin Bieber"];
+const listOfArtists = ["Frank Ocean"];
 let listOfSongs = [];
 let listOfSongNames = [];
 let cacheSongDeets = null;
@@ -26,7 +26,7 @@ async function filterSongs(SongsInJSON, randomArtist) {
             listOfSongNames.push(SongsInJSON[i].trackName);
         }
     }
-    console.log(listOfSongs);
+    console.log(listOfSongs)
 }
 async function GetArtistSongs(randomArtist) {
     const searchArtistsSongsUrl = `https://itunes.apple.com/lookup?id=${encodeURIComponent(randomArtist)}&entity=song&limit=200`;
@@ -60,50 +60,31 @@ document.addEventListener('DOMContentLoaded', async function() {
 }
 });
 
-async function GetRandomSong(TryAgainNumber = 5) {
-    try {
-        const randomArtistName = listOfArtists[Math.floor(Math.random() * listOfArtists.length)];
-        cacheArtistName = randomArtistName;
-        const randomArtistId = await GetArtistIdName(randomArtistName);
-        await GetArtistSongs(randomArtistId);
-        const randomSong = listOfSongs[Math.floor(Math.random() * listOfSongs.length)];
+async function GetRandomSong() {
+    const res = await fetch('/api/random-song?artist=Frank Ocean');
+    const songDeets = await res.json();
 
-        const songDeets = {
-            artistName: randomSong.artistName,
-            albumName: randomSong.collectionName,
-            trackName: randomSong.trackName,
-            releaseDate: randomSong.releaseDate,
-            genre: randomSong.primaryGenreName,
-            SongPreview: randomSong.previewUrl,
-            AlbumCover: randomSong.artworkUrl100,
-        };
-        cacheSongDeets = songDeets;
-        snippetStartTime = Math.floor(Math.random() * (28));
-        document.getElementById('artist-name').textContent = songDeets.artistName;
+    cacheSongDeets = {
+        artistName: songDeets.artistName,
+        albumName: songDeets.albumName,
+        trackName: songDeets.trackName,
+        releaseDate: songDeets.releaseDate,
+        genre: songDeets.genre,
+        SongPreview: songDeets.preview,
+        AlbumCover: songDeets.artwork
+    };
 
-        //HINTS
-        document.getElementById('release-date').textContent = new Date(songDeets.releaseDate).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-        document.getElementById('album-cover').src = songDeets.AlbumCover;
-        document.getElementById('album-name').textContent = songDeets.albumName;
+    document.getElementById('artist-name').textContent = songDeets.artistName;
 
-        GetArtistImage(randomArtistName).then(imageUrl => {
-            document.getElementById('artist-image').src = imageUrl;
-        });
+    document.getElementById('album-cover').src = songDeets.artwork;
+    document.getElementById('album-name').textContent = songDeets.albumName;
 
-        for (let i = 0; i < songDeets.trackName.length; i++) {
-            lettersInSong.push(songDeets.trackName[i].toLowerCase());
-        }
-    } catch (error) {
-        if (TryAgainNumber > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return GetRandomSong(TryAgainNumber - 1);
-        }
-    }
+    // fetch artist image from Flask
+    const imgRes = await fetch(`/api/artist-image?artist=${encodeURIComponent(songDeets.artistName)}`);
+    const imgData = await imgRes.json();
+    document.getElementById('artist-image').src = imgData.image;
 
+    lettersInSong = songDeets.trackName.toLowerCase().split('');
 }
 
 function filterSongName(name) {
