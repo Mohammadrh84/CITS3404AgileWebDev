@@ -22,12 +22,10 @@ def get_songs():
 def random_song():
     artist_name = request.args.get('artist', 'Kanye West')
 
-    # Get artist ID
     search_url = f"https://itunes.apple.com/search?term={artist_name}&entity=musicArtist&limit=1"
     artist_res = requests.get(search_url).json()
     artist_id = artist_res['results'][0]['artistId']
 
-    # Get songs
     songs_url = f"https://itunes.apple.com/lookup?id={artist_id}&entity=song&limit=200"
     songs_res = requests.get(songs_url).json()
 
