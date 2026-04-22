@@ -34,6 +34,14 @@ async function GetRandomSong() {
 
     document.getElementById('artist-name').textContent = songDeets.artistName;
 
+    document.getElementById('release-date').textContent = new Date(songDeets.releaseDate).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+    });
+    document.getElementById('album-cover').src = songDeets.AlbumCover;
+    document.getElementById('album-name').textContent = songDeets.albumName;
+
     document.getElementById('album-cover').src = songDeets.artwork;
     document.getElementById('album-name').textContent = songDeets.albumName;
 
