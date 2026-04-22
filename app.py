@@ -10,6 +10,7 @@ def home():
 
 @app.route('/api/songs')
 def get_songs():
+    ## currently using Kanye as the only artist, but will be selected randomly from their list of specified artists
     artist_name = request.args.get('artist', 'Kanye West')
     search_url = f"https://itunes.apple.com/search?term={artist_name}&entity=musicArtist&limit=1"
     artist_id = requests.get(search_url).json()['results'][0]['artistId']

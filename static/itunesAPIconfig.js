@@ -1,56 +1,14 @@
-let cacheArtistID = null;
 let cacheArtistName = null;
-const listOfArtists = ["Kanye West"];
 let listOfSongs = [];
 let listOfSongNames = [];
 let cacheSongDeets = null;
 let lettersInSong = [];
 let lettersCorrect = [];
 let lettersWrong = [];
-let snippetStartTime = 0;
+let snippetStartTime = 0; // will be randomised in the future
+
 let cacheArtistImage = null;
 
-async function GetArtistIdName(artistName) {
-    const searchForArtistUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=musicArtist&limit=1`;
-    const waitingForArtist = await fetch(searchForArtistUrl);
-    const artistData = await waitingForArtist.json();
-    const artistDetails = artistData.results[0];
-    cacheArtistID = artistDetails.artistId;
-    return artistDetails.artistId;
-}
-
-async function filterSongs(SongsInJSON, randomArtist) {
-    for (let i = 0; i < SongsInJSON.length; i++) {
-        if (SongsInJSON[i].artistId === randomArtist && SongsInJSON[i].wrapperType === "track") {
-            listOfSongs.push(SongsInJSON[i]);
-            listOfSongNames.push(SongsInJSON[i].trackName);
-        }
-    }
-    console.log(listOfSongs)
-}
-async function GetArtistSongs(randomArtist) {
-    const searchArtistsSongsUrl = `https://itunes.apple.com/lookup?id=${encodeURIComponent(randomArtist)}&entity=song&limit=200`;
-    const waitingForSongs = await fetch(searchArtistsSongsUrl);
-    const songsData = await waitingForSongs.json();
-    const songsInJSON = songsData.results;
-
-    listOfSongs = [];
-
-    await filterSongs(songsInJSON, randomArtist);
-}
-
-async function GetArtistImage(randomArtistName) {
-    try {
-        const url = `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(randomArtistName)}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        cacheArtistImage = data.artists?.[0]?.strArtistThumb ?? "";
-        return data.artists?.[0]?.strArtistThumb ?? "";
-    } catch (err) {
-        console.error("Failed to fetch artist image:", err);
-        return "";
-    }
-}
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
@@ -259,7 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // if user clicks outside the dropdown hide it
     document.addEventListener('mousedown', function(event) {
         if (!guessInput.contains(event.target) && !suggestionsList.contains(event.target)) {
             suggestionsList.classList.add('hidden');
