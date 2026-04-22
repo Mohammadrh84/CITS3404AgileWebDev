@@ -85,6 +85,9 @@ async function GetRandomSong() {
     document.getElementById('artist-image').src = imgData.image;
 
     lettersInSong = songDeets.trackName.toLowerCase().split('');
+
+    const songsRes = await fetch('/api/songs?artist=Kanye West');
+    listOfSongNames = await songsRes.json();
 }
 
 function filterSongName(name) {
@@ -257,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // if user clicks outside the dropdown hide it
-    document.addEventListener('click', function(event) {
+    document.addEventListener('mousedown', function(event) {
         if (!guessInput.contains(event.target) && !suggestionsList.contains(event.target)) {
             suggestionsList.classList.add('hidden');
         }

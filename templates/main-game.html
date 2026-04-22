@@ -4,14 +4,12 @@
 <head>
     <title>Spurdle</title>
 
-    <link rel="stylesheet" href="style.css">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Import custom configuration (fonts and colours)-->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='tailwind-config.js') }}"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script src="{{ url_for('static', filename='itunesAPIconfig.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='itunesAPIconfig.js') }}"></script>
 </head>
 
 <!-- Main game -->

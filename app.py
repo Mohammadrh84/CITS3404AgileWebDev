@@ -8,6 +8,16 @@ app = Flask(__name__)
 def home():
     return render_template('main-game.html')
 
+@app.route('/api/songs')
+def get_songs():
+    artist_name = request.args.get('artist', 'Kanye West')
+    search_url = f"https://itunes.apple.com/search?term={artist_name}&entity=musicArtist&limit=1"
+    artist_id = requests.get(search_url).json()['results'][0]['artistId']
+    songs_url = f"https://itunes.apple.com/lookup?id={artist_id}&entity=song&limit=200"
+    results = requests.get(songs_url).json()['results']
+    names = [s['trackName'] for s in results if s.get('wrapperType') == 'track' and s.get('artistId') == artist_id]
+    return jsonify(names)
+
 @app.route('/api/random-song')
 def random_song():
     artist_name = request.args.get('artist', 'Kanye West')
