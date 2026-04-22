@@ -1,10 +1,5 @@
-let cacheArtistName = null;
-let listOfSongs = [];
+let cacheArtistName = "Drake";
 let listOfSongNames = [];
-let cacheSongDeets = null;
-let lettersInSong = [];
-let lettersCorrect = [];
-let lettersWrong = [];
 let snippetStartTime = 0; // will be randomised in the future
 
 let cacheArtistImage = null;
@@ -19,40 +14,33 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 async function GetRandomSong() {
-    const res = await fetch('/api/random-song?artist=Kanye West');
+    const res = await fetch('/api/random-song?artist=' + encodeURIComponent(cacheArtistName));
     const songDeets = await res.json();
 
-    cacheSongDeets = {
-        artistName: songDeets.artistName,
-        albumName: songDeets.albumName,
-        trackName: songDeets.trackName,
-        releaseDate: songDeets.releaseDate,
-        genre: songDeets.genre,
-        SongPreview: songDeets.preview,
-        AlbumCover: songDeets.artwork
-    };
+    document.getElementById('artist-name').textContent = cacheArtistName;
 
-    document.getElementById('artist-name').textContent = songDeets.artistName;
+    
 
-    document.getElementById('release-date').textContent = new Date(songDeets.releaseDate).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-    });
-    document.getElementById('album-cover').src = songDeets.AlbumCover;
-    document.getElementById('album-name').textContent = songDeets.albumName;
+    const [artwork, albumName, releaseDate] = await Promise.all([
+        fetch('/api/song-details?argument=artworkUrl100').then(r => r.json()),
+        fetch('/api/song-details?argument=collectionName').then(r => r.json()),
+        fetch('/api/song-details?argument=releaseDate').then(r => r.json())
+    ]);
 
-    document.getElementById('album-cover').src = songDeets.artwork;
-    document.getElementById('album-name').textContent = songDeets.albumName;
+    document.getElementById('album-cover').src = artwork.value;
+    document.getElementById('album-name').textContent = albumName.value;
+    document.getElementById('release-date').textContent = new Date(releaseDate.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
+
+    
+    
     // fetch artist image from Flask
-    const imgRes = await fetch(`/api/artist-image?artist=${encodeURIComponent(songDeets.artistName)}`);
+    const imgRes = await fetch(`/api/artist-image?artist=` + encodeURIComponent(cacheArtistName));
     const imgData = await imgRes.json();
     document.getElementById('artist-image').src = imgData.image;
+    cacheArtistImage = imgData.image;
 
-    lettersInSong = songDeets.trackName.toLowerCase().split('');
-
-    const songsRes = await fetch('/api/songs?artist=Kanye West');
+    const songsRes = await fetch('/api/songs?artist=' + encodeURIComponent(cacheArtistName));
     listOfSongNames = await songsRes.json();
 }
 
@@ -66,7 +54,8 @@ function filterSongName(name) {
 }
 
 async function isSongCorrect(Guess) {
-    const filteredSong = filterSongName(cacheSongDeets.trackName).toLowerCase();
+    const { value } = await fetch('/api/song-details?argument=trackName').then(r => r.json());
+    const filteredSong = filterSongName(value).toLowerCase();
     const filteredGuess = filterSongName(Guess).toLowerCase();
 
     return filteredGuess === filteredSong;
@@ -120,38 +109,43 @@ function NextHint() {
     hintSections[currentHint].hint.classList.remove('hidden');
     currentHint++;
     document.getElementById('hints-revealed').textContent = `${currentHint} / 5 Revealed`;
+    if (currentHint === 3) {
+        UpdateLettersHint();
+    }
 }
 
 async function checkLetters() {
     const userGuess = document.getElementById('guess-input').value;
     if (!userGuess) return;
 
-    const filteredSong = filterSongName(cacheSongDeets.trackName).toLowerCase();
-    const filteredGuess = filterSongName(userGuess).toLowerCase();
+    const { correct, wrong } = await fetch('/api/check-letters?user-guess=' + encodeURIComponent(userGuess)).then(r => r.json());
 
+    if (currentHint >= 3) {
+        UpdateLettersHint();
+    }
+}
+async function UpdateLettersHint() {
+    const { correct, wrong } = await fetch('/api/current-letters').then(r => r.json());
 
-    for (let i = 0; i < filteredGuess.length; i++) {
-        const letterElement = document.getElementById(`letter-${filteredGuess[i].toUpperCase()}`);
+    for (let i = 0; i < correct.length; i++) {
+        const letterElement = document.getElementById(`letter-${correct[i].toUpperCase()}`);
         if (!letterElement) continue;
-        if (lettersCorrect.includes(filteredGuess[i]) || lettersWrong.includes(filteredGuess[i])) {
-            continue;
-        } else {
-            if (lettersInSong.includes(filteredGuess[i])) {
-                lettersCorrect.push(filteredGuess[i]);
-                letterElement.classList.remove('text-white/80');
-                letterElement.classList.add('text-neon-green');
-            } else {
-                lettersWrong.push(filteredGuess[i]);
-                letterElement.classList.remove('text-white/80');
-                letterElement.classList.add('text-[#ff4a6e]');
-            }
-        }
+        letterElement.classList.remove('text-white/80');
+        letterElement.classList.add('text-neon-green');
+    }
+    for (let i = 0; i < wrong.length; i++) {
+        const letterElement = document.getElementById(`letter-${wrong[i].toUpperCase()}`);
+        if (!letterElement) continue;
+        letterElement.classList.remove('text-white/80');
+        letterElement.classList.add('text-[#ff4a6e]');
     }
 }
 
+
 async function playSnippet() {
-    const audio = new Audio(cacheSongDeets.SongPreview);
-    
+    const { value } = await fetch('/api/song-details?argument=previewUrl').then(r => r.json());
+    const audio = new Audio(value);
+
     audio.currentTime = snippetStartTime;
     audio.play();
 
@@ -161,13 +155,15 @@ async function playSnippet() {
 }
 
 async function showResultsOverlay(results) {
+
     const overlay = document.getElementById('result-overlay');
     const overlayTitle = document.getElementById('overlay-title');
     const overlaySubTitle = document.getElementById('overlay-subtitle');
     
     document.getElementById('artist-image-result').src = cacheArtistImage;
     document.getElementById('artist-name-results').textContent = cacheArtistName;
-    document.getElementById('song-name-results').textContent = cacheSongDeets.trackName;
+    const { value } = await fetch('/api/song-details?argument=trackName').then(r => r.json());
+    document.getElementById('song-name-results').textContent = value;
     if (results) {
         overlayTitle.textContent = "You did it!";
         overlaySubTitle.textContent = "Play again and see if you can get a streak going!";
