@@ -8,10 +8,11 @@ tailwind.config = {
         'input-gray': '#333333',
         'input-border-gray': '#606060',
         'placeholder-gray': '#BFBFBF',
+        'guessing-background': '#131318'
       },
       fontFamily: {
         'syne': ['Syne-ExtraBold', 'sans-serif'],
-        'montserrat': ['Montserrat-VariableFont_wght', 'sans-serif'],
+        'montserrat': ['Montserrat', 'sans-serif'],
       }
     }
   }
