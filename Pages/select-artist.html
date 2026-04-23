@@ -32,75 +32,55 @@
                 </nav>
             </div>
 
-            <div class="mt-8 grid gap-4 lg:grid-cols-[1.45fr_1fr]">
-                <div>
-                    <p class="text-sm uppercase tracking-[0.35em] text-neon-green/80">artist setup</p>
-                    <h2 class="mt-3 text-4xl font-bold md:text-5xl">Select your artists</h2>
-                    <p class="mt-4 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
-                        Search for artists you want in your game, add them to your selected list,
-                        and start once you are happy with your choices.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <p class="text-xs uppercase tracking-[0.2em] text-white/50">Available artists</p>
-                        <p id="availableArtistsCount" class="mt-3 text-2xl font-bold">0</p>
-                    </div>
-
-                    <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                        <p class="text-xs uppercase tracking-[0.2em] text-white/50">Selected artists</p>
-                        <p id="selectedArtistsCount" class="mt-3 text-2xl font-bold">0</p>
-                    </div>
-                </div>
+            <div class="mt-8">
+                <p class="text-sm uppercase tracking-[0.35em] text-neon-green/80">artist setup</p>
+                <h2 class="mt-3 text-4xl font-bold md:text-5xl">Select your artists</h2>
+                <p class="mt-4 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
+                    Search for artists you want in your game and add them to your selected list.
+                </p>
             </div>
         </header>
 
         <section class="mt-6 rounded-[28px] border border-white/10 bg-[#131318] p-4 md:p-6">
-            <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                <div>
-                    <h3 class="text-xl font-bold md:text-2xl">Artist Search</h3>
-                    <p class="mt-1 text-sm text-white/55">
-                        Add one or more artists to personalise your Spurdle game.
-                    </p>
-                </div>
-            </div>
+            <div class="mx-auto max-w-3xl">
+                <div class="relative">
+                    <input
+                        id="artistSearch"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Search artists"
+                        class="w-full rounded-[28px] border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 focus:border-neon-green"
+                    >
 
-            <div class="mt-5">
-                <input
-                    id="artistSearch"
-                    type="text"
-                    placeholder="Search artists"
-                    class="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 focus:border-neon-green"
+                    <ul
+                        id="searchResults"
+                        class="absolute left-0 right-0 z-[99] mt-3 hidden max-h-72 overflow-y-auto rounded-2xl border border-white/10 bg-card-black shadow-xl shadow-black/50"
+                    ></ul>
+                </div>
+
+                <div class="mt-10">
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold md:text-3xl">Selected Artist/s:</h3>
+                            <p class="mt-1 text-sm text-white/55">
+                                Choose at least one artist before starting the game.
+                            </p>
+                        </div>
+
+                        <p id="selectedArtistsSummary" class="text-sm text-white/60">0 selected</p>
+                    </div>
+
+                    <div id="selectedArtists" class="mt-5 space-y-3"></div>
+                </div>
+
+                <button
+                    id="startButton"
+                    class="mt-8 w-full rounded-full bg-white/10 px-4 py-3 font-bold text-white/40 cursor-not-allowed transition md:mx-auto md:block md:w-64"
+                    disabled
                 >
+                    Start
+                </button>
             </div>
-
-            <div class="mt-5">
-                <p class="text-sm font-semibold text-white/70">Search results</p>
-                <div id="searchResults" class="mt-3 space-y-3"></div>
-            </div>
-        </section>
-
-        <section class="mt-6 rounded-[28px] border border-white/10 bg-[#131318] p-4 md:p-6">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h3 class="text-xl font-bold md:text-2xl">Selected artists</h3>
-                    <p class="mt-1 text-sm text-white/55">
-                        Choose at least one artist before starting the game.
-                    </p>
-                </div>
-
-                <p id="selectedArtistsSummary" class="text-sm text-white/60">0 selected</p>
-            </div>
-
-            <div id="selectedArtists" class="mt-5 space-y-3"></div>
-
-            <button
-                id="startButton"
-                class="mt-6 w-full rounded-xl bg-neon-green px-4 py-3 font-bold text-black transition md:w-auto md:min-w-[220px]"
-            >
-                Start game
-            </button>
         </section>
     </main>
 </body>
