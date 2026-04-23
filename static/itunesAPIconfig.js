@@ -1,4 +1,4 @@
-let cacheArtistName = "Drake";
+let cacheArtistName = "Taylor Swift"; 
 let listOfSongNames = [];
 let snippetStartTime = 0; // will be randomised in the future
 
@@ -7,6 +7,7 @@ let cacheArtistImage = null;
 
 document.addEventListener('DOMContentLoaded', async function() {
     try {
+        await fetch('/api/reset');
         await GetRandomSong();
     } catch (error) {
         console.error("Error occurred while fetching random song:", error);
@@ -66,8 +67,12 @@ async function isSongCorrect(Guess) {
         'current-hint': 0
     });
     
-    const { GuessStatus, CurrentPoints } = await fetch(`/api/points?${params}`).then(r => r.json());
+    const { GuessStatus, CurrentPoints, GameStatus } = await fetch(`/api/points?${params}`).then(r => r.json());
     document.getElementById('current-points').textContent = CurrentPoints;
+    if (GameStatus) {
+        showResultsOverlay();
+        return GuessStatus;
+    } 
     return GuessStatus;
 }
 

@@ -115,11 +115,11 @@ num_guesses = 0
 @app.route('/api/points')
 def calculate_points():
     global current_points
+    global num_guesses
     user_guess = request.args.get('user-guess')
     song_name = request.args.get('song-name')
     type_of_points = int(request.args.get('type'))
     current_hint = int(request.args.get('current-hint'))
-    print(f"{user_guess} {song_name}")
     if (type_of_points == 0): #0 is Guess
         current_points -= 3
     elif (type_of_points == 1): #1 is Hint
@@ -135,21 +135,21 @@ def calculate_points():
             current_points -= 15
     num_guesses += 1
     if num_guesses <= 15 and user_guess == song_name and user_guess != "" and song_name != "":
-        final_points = current_points
         reset_game()
-        return jsonify({"CurrentPoints": final_points, "GuessResult": True})
+        return jsonify({"GameStatus": True, "GuessStatus": True})
 
     if current_points <= 0:
         reset_game()
-        return jsonify({"CurrentPoints": current_points, "GuessResult": False})
+        return jsonify({"GameStatus": True, "GuessStatus": False}) #end game
 
+    return jsonify({"CurrentPoints": current_points, "GuessStatus": False})
 
+@app.route('/api/reset')
 def reset_game():
     global current_points
     current_points = 100
     letters_correct.clear()
     letters_wrong.clear()
-    print("Game reset successfully")
     return jsonify({"message": "Game reset successfully"})
 
 
