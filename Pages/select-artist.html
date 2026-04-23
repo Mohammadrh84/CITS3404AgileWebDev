@@ -52,10 +52,12 @@
                         class="w-full rounded-[28px] border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 focus:border-neon-green"
                     >
 
-                    <ul
-                        id="searchResults"
-                        class="absolute left-0 right-0 z-[99] mt-3 hidden max-h-72 overflow-y-auto rounded-2xl border border-white/10 bg-card-black shadow-xl shadow-black/50"
-                    ></ul>
+                    <div
+                        id="searchResultsWrap"
+                        class="absolute left-0 right-0 z-[99] mt-3 hidden rounded-2xl border border-white/10 bg-card-black p-3 shadow-xl shadow-black/50"
+                    >
+                        <ul id="searchResults" class="flex flex-wrap gap-3"></ul>
+                    </div>
                 </div>
 
                 <div class="mt-10">
@@ -70,7 +72,7 @@
                         <p id="selectedArtistsSummary" class="text-sm text-white/60">0 selected</p>
                     </div>
 
-                    <div id="selectedArtists" class="mt-5 space-y-3"></div>
+                    <div id="selectedArtists" class="mt-5"></div>
                 </div>
 
                 <button

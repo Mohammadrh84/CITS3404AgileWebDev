@@ -1,4 +1,5 @@
 const searchResults = document.getElementById("searchResults");
+const searchResultsWrap = document.getElementById("searchResultsWrap");
 const selectedArtists = document.getElementById("selectedArtists");
 const artistSearch = document.getElementById("artistSearch");
 const startButton = document.getElementById("startButton");
@@ -20,13 +21,13 @@ function getFallbackImage() {
   return "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 }
 
-function hideSearchResults() {
-  searchResults.classList.add("hidden");
-  searchResults.innerHTML = "";
+function showSearchResults() {
+  searchResultsWrap.classList.remove("hidden");
 }
 
-function showSearchResults() {
-  searchResults.classList.remove("hidden");
+function hideSearchResults() {
+  searchResultsWrap.classList.add("hidden");
+  searchResults.innerHTML = "";
 }
 
 function isAlreadySelected(artistId) {
@@ -81,33 +82,30 @@ function renderSelectedArtists() {
     return;
   }
 
+  const chipsWrapper = document.createElement("div");
+  chipsWrapper.className = "flex flex-wrap gap-3";
+
   chosenArtists.forEach((artist, index) => {
-    const card = document.createElement("div");
-    card.className =
-      "rounded-2xl border border-white/10 bg-white/5 p-4 flex items-center justify-between gap-4";
+    const chip = document.createElement("div");
+    chip.className =
+      "flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3";
 
-    card.innerHTML = `
-      <div class="flex items-center gap-4 min-w-0">
-        <img
-          src="${artist.image}"
-          alt="${artist.name}"
-          class="w-14 h-14 rounded-2xl object-cover shrink-0 bg-black/20"
-        >
-        <div class="min-w-0">
-          <p class="text-lg font-bold text-white truncate">${artist.name}</p>
-          <p class="text-sm text-white/55">Selected for this game</p>
-        </div>
-      </div>
-
+    chip.innerHTML = `
+      <img
+        src="${artist.image}"
+        alt="${artist.name}"
+        class="w-10 h-10 rounded-full object-cover shrink-0 bg-black/20"
+      >
+      <span class="max-w-[170px] truncate text-sm font-semibold text-white">${artist.name}</span>
       <button
-        class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm font-semibold text-white transition hover:text-neon-green"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-sm font-bold text-white transition hover:text-neon-green"
         aria-label="Remove ${artist.name}"
       >
-        Remove
+        ×
       </button>
     `;
 
-    const removeButton = card.querySelector("button");
+    const removeButton = chip.querySelector("button");
     removeButton.addEventListener("click", function () {
       chosenArtists.splice(index, 1);
       renderSelectedArtists();
@@ -118,9 +116,10 @@ function renderSelectedArtists() {
       }
     });
 
-    selectedArtists.appendChild(card);
+    chipsWrapper.appendChild(chip);
   });
 
+  selectedArtists.appendChild(chipsWrapper);
   updateStartButton();
 }
 
@@ -133,29 +132,11 @@ function addArtist(artist) {
   renderSelectedArtists();
 }
 
-function renderSearchLoading() {
+function renderSearchMessage(message, isError = false) {
   showSearchResults();
   searchResults.innerHTML = `
-    <li class="px-4 py-3 text-sm text-white/60">
-      Searching...
-    </li>
-  `;
-}
-
-function renderSearchEmpty() {
-  showSearchResults();
-  searchResults.innerHTML = `
-    <li class="px-4 py-3 text-sm text-white/60">
-      No artists found.
-    </li>
-  `;
-}
-
-function renderSearchError() {
-  showSearchResults();
-  searchResults.innerHTML = `
-    <li class="px-4 py-3 text-sm text-red-400">
-      Error searching artists.
+    <li class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm ${isError ? "text-red-400" : "text-white/60"}">
+      ${message}
     </li>
   `;
 }
@@ -172,17 +153,17 @@ function renderSearchResults(results) {
 
     const alreadySelected = isAlreadySelected(artist.id);
     const item = document.createElement("li");
-
-    item.className = `
-      px-4 py-3 border-b border-white/5 last:border-0
-      flex items-center justify-between gap-3
-      ${alreadySelected ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:bg-neon-green/10"}
-    `;
+    item.className = "list-none";
 
     const imageId = `artist-image-${artist.id}-${index}`;
 
     item.innerHTML = `
-      <div class="flex items-center gap-3 min-w-0">
+      <button
+        type="button"
+        class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3 transition
+        ${alreadySelected ? "opacity-60 cursor-not-allowed" : "hover:border-neon-green/30 hover:bg-neon-green/10"}"
+        ${alreadySelected ? "disabled" : ""}
+      >
         <img
           id="${imageId}"
           src="${artist.image}"
@@ -190,21 +171,24 @@ function renderSearchResults(results) {
           class="w-10 h-10 rounded-full object-cover shrink-0 bg-black/20"
         >
 
-        <div class="min-w-0">
-          <p class="text-sm font-semibold text-white truncate">${artist.name}</p>
-          <p class="text-xs text-white/45">
-            ${alreadySelected ? "Already selected" : "Tap to add"}
-          </p>
-        </div>
-      </div>
+        <span class="max-w-[160px] truncate text-sm font-semibold text-white">${artist.name}</span>
 
-      <span class="text-xs font-semibold ${alreadySelected ? "text-neon-green" : "text-white/45"}">
-        ${alreadySelected ? "Selected" : "Add"}
-      </span>
+        <span class="rounded-full bg-black/30 px-3 py-1 text-xs font-semibold ${alreadySelected ? "text-neon-green" : "text-white/70"}">
+          ${alreadySelected ? "Selected" : "Add"}
+        </span>
+      </button>
     `;
 
+    const button = item.querySelector("button");
+
     if (!alreadySelected) {
-      item.addEventListener("click", async function () {
+      button.addEventListener("click", async function () {
+        button.disabled = true;
+        const status = button.querySelector("span:last-child");
+        if (status) {
+          status.textContent = "Loading...";
+        }
+
         artist.image = await getArtistImageFromApple(artist.id);
         addArtist(artist);
         artistSearch.value = "";
@@ -231,24 +215,24 @@ async function searchArtistsFromAPI(query) {
     return;
   }
 
-  renderSearchLoading();
+  renderSearchMessage("Searching...");
 
   try {
     const response = await fetch(
-      `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicArtist&limit=5`
+      `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=musicArtist&limit=6`
     );
     const data = await response.json();
     const results = data.results || [];
 
     if (results.length === 0) {
-      renderSearchEmpty();
+      renderSearchMessage("No artists found.");
       return;
     }
 
     renderSearchResults(results);
   } catch (error) {
     console.error("Artist search failed:", error);
-    renderSearchError();
+    renderSearchMessage("Error searching artists.", true);
   }
 }
 
@@ -260,7 +244,7 @@ artistSearch.addEventListener(
 );
 
 document.addEventListener("click", function (event) {
-  if (!artistSearch.contains(event.target) && !searchResults.contains(event.target)) {
+  if (!artistSearch.contains(event.target) && !searchResultsWrap.contains(event.target)) {
     hideSearchResults();
   }
 });
