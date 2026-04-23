@@ -135,7 +135,7 @@ function addArtist(artist) {
 function renderSearchMessage(message, isError = false) {
   showSearchResults();
   searchResults.innerHTML = `
-    <li class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm ${isError ? "text-red-400" : "text-white/60"}">
+    <li class="px-4 py-3 text-sm ${isError ? "text-red-400" : "text-white/60"} border-b border-white/5 last:border-0">
       ${message}
     </li>
   `;
@@ -153,27 +153,34 @@ function renderSearchResults(results) {
 
     const alreadySelected = isAlreadySelected(artist.id);
     const item = document.createElement("li");
-    item.className = "list-none";
+    item.className =
+      "px-4 py-3 border-b border-white/5 last:border-0";
 
     const imageId = `artist-image-${artist.id}-${index}`;
 
     item.innerHTML = `
       <button
         type="button"
-        class="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3 transition
-        ${alreadySelected ? "opacity-60 cursor-not-allowed" : "hover:border-neon-green/30 hover:bg-neon-green/10"}"
+        class="w-full flex items-center justify-between gap-3 text-left ${alreadySelected ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:text-neon-green"}"
         ${alreadySelected ? "disabled" : ""}
       >
-        <img
-          id="${imageId}"
-          src="${artist.image}"
-          alt="${artist.name}"
-          class="w-10 h-10 rounded-full object-cover shrink-0 bg-black/20"
-        >
+        <div class="flex items-center gap-3 min-w-0">
+          <img
+            id="${imageId}"
+            src="${artist.image}"
+            alt="${artist.name}"
+            class="w-10 h-10 rounded-full object-cover shrink-0 bg-black/20"
+          >
 
-        <span class="max-w-[160px] truncate text-sm font-semibold text-white">${artist.name}</span>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-white truncate">${artist.name}</p>
+            <p class="text-xs text-white/45">
+              ${alreadySelected ? "Already selected" : "Tap to add"}
+            </p>
+          </div>
+        </div>
 
-        <span class="rounded-full bg-black/30 px-3 py-1 text-xs font-semibold ${alreadySelected ? "text-neon-green" : "text-white/70"}">
+        <span class="shrink-0 text-xs font-semibold ${alreadySelected ? "text-neon-green" : "text-white/45"}">
           ${alreadySelected ? "Selected" : "Add"}
         </span>
       </button>
@@ -183,7 +190,6 @@ function renderSearchResults(results) {
 
     if (!alreadySelected) {
       button.addEventListener("click", async function () {
-        button.disabled = true;
         const status = button.querySelector("span:last-child");
         if (status) {
           status.textContent = "Loading...";

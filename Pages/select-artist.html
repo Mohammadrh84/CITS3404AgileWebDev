@@ -54,9 +54,12 @@
 
                     <div
                         id="searchResultsWrap"
-                        class="absolute left-0 right-0 z-[99] mt-3 hidden rounded-2xl border border-white/10 bg-card-black p-3 shadow-xl shadow-black/50"
+                        class="absolute left-0 right-0 z-[99] mt-3 hidden overflow-hidden rounded-2xl border border-white/10 bg-card-black shadow-xl shadow-black/50"
                     >
-                        <ul id="searchResults" class="flex flex-wrap gap-3"></ul>
+                        <ul
+                            id="searchResults"
+                            class="max-h-72 overflow-y-auto"
+                        ></ul>
                     </div>
                 </div>
 
