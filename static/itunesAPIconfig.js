@@ -183,7 +183,6 @@ async function playSnippet() {
 }
 
 async function showResultsOverlay(results) {
-
     const overlay = document.getElementById('result-overlay');
     const overlayTitle = document.getElementById('overlay-title');
     const overlaySubTitle = document.getElementById('overlay-subtitle');
@@ -196,6 +195,8 @@ async function showResultsOverlay(results) {
         overlayTitle.textContent = "You did it!";
         overlaySubTitle.textContent = "Play again and see if you can get a streak going!";
     } else {
+        document.getElementById('your-score').textContent = 0;
+        document.getElementById('total-points').textContent = "test";
         overlayTitle.textContent = "Oops! Dont worry you cant win them all.";
         overlaySubTitle.textContent = "Try again, you got the next one!";
     }
