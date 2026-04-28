@@ -1,7 +1,9 @@
 let cacheArtistID = null;
 let cacheArtistName = null;
-const listOfArtists = ["Taylor swift", "Ed Sheeran", "Adele", "Drake", "Beyoncé", "The Weeknd", "Billie Eilish", "Bruno Mars", "Ariana Grande", "Justin Bieber"];
-let listOfSongs = [];
+const savedArtists = JSON.parse(localStorage.getItem("selectedArtists")) || [];
+const listOfArtists = savedArtists.length > 0
+    ? savedArtists.map(artist => artist.name)
+    : ["Taylor Swift", "Ed Sheeran", "Adele", "Drake", "Beyoncé", "The Weeknd", "Billie Eilish", "Bruno Mars", "Ariana Grande", "Justin Bieber"];let listOfSongs = [];
 let listOfSongNames = [];
 let cacheSongDeets = null;
 let lettersInSong = [];
