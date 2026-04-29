@@ -9,6 +9,7 @@ const startButtonMessage = document.getElementById("startButtonMessage");
 
 const MAX_SELECTED_ARTISTS = 10;
 const SELECTED_ARTISTS_STORAGE_KEY = "selectedArtists";
+const FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 
 const chosenArtists = [];
 
@@ -25,7 +26,15 @@ function debounce(func, timeout = 400) {
 }
 
 function getFallbackImage() {
-  return "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
+  return FALLBACK_ARTIST_IMAGE;
+}
+
+function handleBrokenArtistImage(imageElement) {
+  imageElement.addEventListener("error", function () {
+    if (imageElement.src !== FALLBACK_ARTIST_IMAGE) {
+      imageElement.src = FALLBACK_ARTIST_IMAGE;
+    }
+  });
 }
 
 function saveSelectedArtists() {
@@ -168,6 +177,9 @@ function renderSelectedArtists() {
       </button>
     `;
 
+    const chipImage = chip.querySelector("img");
+    handleBrokenArtistImage(chipImage);
+
     const removeButton = chip.querySelector("button");
 
     removeButton.addEventListener("click", function () {
@@ -276,6 +288,9 @@ function renderSearchResults(results) {
       </button>
     `;
 
+    const resultImage = item.querySelector("img");
+    handleBrokenArtistImage(resultImage);
+
     const button = item.querySelector("button");
 
     if (!cannotAdd) {
@@ -309,6 +324,7 @@ function renderSearchResults(results) {
 
       if (imageElement) {
         imageElement.src = imageUrl;
+        handleBrokenArtistImage(imageElement);
       }
     });
   });
@@ -333,7 +349,7 @@ async function searchArtistsFromAPI(query) {
     const results = data.results || [];
 
     if (results.length === 0) {
-      renderSearchMessage("No artists found.");
+      renderSearchMessage("No artists found. Try a different spelling.");
       return;
     }
 
