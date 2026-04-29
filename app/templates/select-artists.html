@@ -58,25 +58,34 @@
                         </p>
                     </div>
 
-                    <p
-                        id="selectedArtistsCount"
-                        class="text-sm text-white/60"
-                    >
+                    <p id="selectedArtistsCount" class="text-sm text-white/60">
                         {{ selected_artist_ids|length }} / 10 selected
                     </p>
                 </div>
 
-                <p
-                    id="artistLimitMessage"
-                    class="mt-4 hidden rounded-2xl border border-[#ff4a6e]/50 bg-[#ff4a6e1f] p-3 text-sm text-[#ff4a6e]"
-                >
+                <div class="mt-5">
+                    <label for="artistFilterInput" class="mb-2 block text-sm font-semibold text-white/70">
+                        Search artists
+                    </label>
+
+                    <input
+                        id="artistFilterInput"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Type an artist name..."
+                        class="w-full rounded-[28px] border border-white/10 bg-black/30 px-4 py-3 text-base text-white outline-none placeholder:text-white/35 focus:border-neon-green"
+                    >
+
+                    <p id="noArtistMatchesMessage" class="mt-4 hidden rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-white/60">
+                        No matching artists found.
+                    </p>
+                </div>
+
+                <p id="artistLimitMessage" class="mt-4 hidden rounded-2xl border border-[#ff4a6e]/50 bg-[#ff4a6e1f] p-3 text-sm text-[#ff4a6e]">
                     You can only select up to 10 artists.
                 </p>
 
-                <p
-                    id="artistRequiredMessage"
-                    class="mt-4 hidden rounded-2xl border border-[#ff4a6e]/50 bg-[#ff4a6e1f] p-3 text-sm text-[#ff4a6e]"
-                >
+                <p id="artistRequiredMessage" class="mt-4 hidden rounded-2xl border border-[#ff4a6e]/50 bg-[#ff4a6e1f] p-3 text-sm text-[#ff4a6e]">
                     Please select at least one artist before saving.
                 </p>
 
@@ -137,9 +146,13 @@
                     </div>
                 {% endif %}
 
-                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div id="artistCardsGrid" class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {% for artist in artists %}
-                        <label class="artist-card cursor-pointer rounded-[24px] border border-white/10 bg-white/5 p-4 transition hover:border-neon-green hover:bg-neon-green/5">
+                        <label
+                            class="artist-card cursor-pointer rounded-[24px] border border-white/10 bg-white/5 p-4 transition hover:border-neon-green hover:bg-neon-green/5"
+                            data-artist-name="{{ artist.name|lower }}"
+                            data-artist-genre="{{ artist.genre|lower }}"
+                        >
                             <div class="flex items-center gap-4">
                                 <input
                                     type="checkbox"
@@ -189,10 +202,7 @@
                         Clear current selection
                     </button>
 
-                    <p
-                        id="saveArtistsMessage"
-                        class="text-center text-sm text-white/50"
-                    >
+                    <p id="saveArtistsMessage" class="text-center text-sm text-white/50">
                         Select at least one artist to continue.
                     </p>
                 </div>

@@ -5,7 +5,11 @@ const artistRequiredMessage = document.getElementById("artistRequiredMessage");
 const saveArtistsButton = document.getElementById("saveArtistsButton");
 const saveArtistsMessage = document.getElementById("saveArtistsMessage");
 const clearArtistsButton = document.getElementById("clearArtistsButton");
+const artistFilterInput = document.getElementById("artistFilterInput");
+const noArtistMatchesMessage = document.getElementById("noArtistMatchesMessage");
+
 const artistCheckboxes = document.querySelectorAll(".artist-checkbox");
+const artistCards = document.querySelectorAll(".artist-card");
 
 const maxArtists = Number(selectArtistsForm.dataset.maxArtists);
 
@@ -65,6 +69,31 @@ function updateSelectedCount() {
   updateArtistCardStyles();
 }
 
+function filterArtistCards() {
+  const searchText = artistFilterInput.value.toLowerCase().trim();
+  let visibleCards = 0;
+
+  artistCards.forEach((card) => {
+    const artistName = card.dataset.artistName || "";
+    const artistGenre = card.dataset.artistGenre || "";
+    const matchesSearch =
+      artistName.includes(searchText) || artistGenre.includes(searchText);
+
+    if (matchesSearch) {
+      card.classList.remove("hidden");
+      visibleCards++;
+    } else {
+      card.classList.add("hidden");
+    }
+  });
+
+  if (visibleCards === 0) {
+    noArtistMatchesMessage.classList.remove("hidden");
+  } else {
+    noArtistMatchesMessage.classList.add("hidden");
+  }
+}
+
 artistCheckboxes.forEach((checkbox) => {
   checkbox.addEventListener("change", function () {
     const selectedCount = getSelectedArtistCount();
@@ -88,6 +117,10 @@ clearArtistsButton.addEventListener("click", function () {
   updateSelectedCount();
 });
 
+artistFilterInput.addEventListener("input", function () {
+  filterArtistCards();
+});
+
 selectArtistsForm.addEventListener("submit", function (event) {
   const selectedCount = getSelectedArtistCount();
   const clickedButton = document.activeElement;
@@ -104,3 +137,4 @@ selectArtistsForm.addEventListener("submit", function (event) {
 });
 
 updateSelectedCount();
+filterArtistCards();

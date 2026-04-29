@@ -31,66 +31,30 @@ def sign_up():
 
 def get_selectable_artists():
     return [
-        {
-            "id": "taylor-swift",
-            "name": "Taylor Swift",
-            "genre": "Pop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "ed-sheeran",
-            "name": "Ed Sheeran",
-            "genre": "Pop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "adele",
-            "name": "Adele",
-            "genre": "Pop/Soul",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "drake",
-            "name": "Drake",
-            "genre": "Hip-Hop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "the-weeknd",
-            "name": "The Weeknd",
-            "genre": "R&B/Pop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "billie-eilish",
-            "name": "Billie Eilish",
-            "genre": "Alternative",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "bruno-mars",
-            "name": "Bruno Mars",
-            "genre": "Pop/Funk",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "ariana-grande",
-            "name": "Ariana Grande",
-            "genre": "Pop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "justin-bieber",
-            "name": "Justin Bieber",
-            "genre": "Pop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        },
-        {
-            "id": "beyonce",
-            "name": "Beyoncé",
-            "genre": "R&B/Pop",
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-        }
+        {"id": "taylor-swift", "name": "Taylor Swift", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "ed-sheeran", "name": "Ed Sheeran", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "adele", "name": "Adele", "genre": "Pop/Soul", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "drake", "name": "Drake", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "the-weeknd", "name": "The Weeknd", "genre": "R&B/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "billie-eilish", "name": "Billie Eilish", "genre": "Alternative", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "bruno-mars", "name": "Bruno Mars", "genre": "Pop/Funk", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "ariana-grande", "name": "Ariana Grande", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "justin-bieber", "name": "Justin Bieber", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "beyonce", "name": "Beyoncé", "genre": "R&B/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "dua-lipa", "name": "Dua Lipa", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "post-malone", "name": "Post Malone", "genre": "Hip-Hop/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "harry-styles", "name": "Harry Styles", "genre": "Pop/Rock", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "olivia-rodrigo", "name": "Olivia Rodrigo", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "rihanna", "name": "Rihanna", "genre": "R&B/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "eminem", "name": "Eminem", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "kendrick-lamar", "name": "Kendrick Lamar", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "sza", "name": "SZA", "genre": "R&B", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "coldplay", "name": "Coldplay", "genre": "Alternative/Rock", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "imagine-dragons", "name": "Imagine Dragons", "genre": "Alternative/Rock", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "bad-bunny", "name": "Bad Bunny", "genre": "Latin", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "travis-scott", "name": "Travis Scott", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "doja-cat", "name": "Doja Cat", "genre": "Pop/Rap", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
+        {"id": "lana-del-rey", "name": "Lana Del Rey", "genre": "Alternative", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"}
     ]
 
 
@@ -118,12 +82,15 @@ def select_artists():
             if artist_id in valid_artist_ids
         ]
 
-        selected_artist_ids = selected_artist_ids[:10]
-
         if len(selected_artist_ids) == 0:
             error_message = "Please select at least one artist before saving."
             saved = False
             cleared = False
+        elif len(selected_artist_ids) > 10:
+            error_message = "Please select no more than 10 artists."
+            saved = False
+            cleared = False
+            selected_artist_ids = selected_artist_ids[:10]
         else:
             session['selected_artists'] = selected_artist_ids
             return redirect(url_for('select_artists', saved='1'))
@@ -153,6 +120,9 @@ def get_selected_artists():
         artist for artist in artists
         if artist["id"] in selected_artist_ids
     ]
+
+    if len(selected_artists) == 0:
+        selected_artists = artists
 
     return jsonify(selected_artists)
 
