@@ -90,6 +90,11 @@ clearArtistsButton.addEventListener("click", function () {
 
 selectArtistsForm.addEventListener("submit", function (event) {
   const selectedCount = getSelectedArtistCount();
+  const clickedButton = document.activeElement;
+
+  if (clickedButton && clickedButton.value === "clear") {
+    return;
+  }
 
   if (selectedCount === 0) {
     event.preventDefault();

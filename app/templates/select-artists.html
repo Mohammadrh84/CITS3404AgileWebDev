@@ -15,17 +15,17 @@
     <main class="max-w-6xl mx-auto px-4 py-6 md:px-8 lg:px-12">
         <header class="rounded-[28px] border border-white/10 bg-black/40 p-4 shadow-[0_0_30px_rgba(0,0,0,0.25)] md:p-6">
             <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <a href="/" class="inline-block">
+                <a href="{{ url_for('home') }}" class="inline-block">
                     <h1 class="font-syne text-5xl leading-none md:text-6xl">
                         <span class="text-white">spu</span><span class="text-neon-green">rdle</span>
                     </h1>
                 </a>
 
                 <nav class="flex flex-wrap items-center gap-3 text-sm font-semibold md:gap-6">
-                    <a href="#" class="transition hover:text-neon-green">Leaderboard</a>
-                    <a href="#" class="transition hover:text-neon-green">Login</a>
+                    <a href="{{ url_for('leaderboard') }}" class="transition hover:text-neon-green">Leaderboard</a>
+                    <a href="{{ url_for('sign_in') }}" class="transition hover:text-neon-green">Login</a>
                     <a
-                        href="/"
+                        href="{{ url_for('home') }}"
                         class="rounded-xl bg-neon-green px-4 py-2 text-black transition hover:scale-105"
                     >
                         Game
@@ -92,6 +92,51 @@
                     </div>
                 {% endif %}
 
+                {% if cleared %}
+                    <div class="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+                        Saved artists cleared.
+                    </div>
+                {% endif %}
+
+                {% if selected_artists|length > 0 %}
+                    <div class="mt-5 rounded-2xl border border-white/10 bg-black/30 p-4">
+                        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <h4 class="text-lg font-bold text-white">Current saved selection</h4>
+                                <p class="mt-1 text-sm text-white/55">
+                                    These artists are currently saved in your Flask session.
+                                </p>
+                            </div>
+
+                            <div class="flex flex-col gap-2 sm:flex-row">
+                                <a
+                                    href="{{ url_for('home') }}"
+                                    class="inline-flex justify-center rounded-full bg-neon-green px-5 py-2 text-sm font-bold text-black transition hover:scale-105"
+                                >
+                                    Start game
+                                </a>
+
+                                <button
+                                    type="submit"
+                                    name="form_action"
+                                    value="clear"
+                                    class="rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold text-white/70 transition hover:border-[#ff4a6e] hover:text-[#ff4a6e]"
+                                >
+                                    Clear saved artists
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            {% for artist in selected_artists %}
+                                <span class="rounded-full border border-neon-green/20 bg-neon-green/5 px-3 py-2 text-sm font-semibold text-neon-green">
+                                    {{ artist.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
                 <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {% for artist in artists %}
                         <label class="artist-card cursor-pointer rounded-[24px] border border-white/10 bg-white/5 p-4 transition hover:border-neon-green hover:bg-neon-green/5">
@@ -128,6 +173,8 @@
                     <button
                         id="saveArtistsButton"
                         type="submit"
+                        name="form_action"
+                        value="save"
                         class="w-full rounded-full bg-white/10 px-4 py-3 font-bold text-white/40 cursor-not-allowed transition md:w-64"
                         disabled
                     >
@@ -139,7 +186,7 @@
                         type="button"
                         class="hidden rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/70 transition hover:border-neon-green hover:text-neon-green"
                     >
-                        Clear selection
+                        Clear current selection
                     </button>
 
                     <p

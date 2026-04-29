@@ -14,6 +14,21 @@ def home():
     return render_template('main-game.html')
 
 
+@app.route('/leaderboard')
+def leaderboard():
+    return render_template('leaderboard.html')
+
+
+@app.route('/sign-in')
+def sign_in():
+    return render_template('sign-in.html')
+
+
+@app.route('/sign-up')
+def sign_up():
+    return render_template('sign-up.html')
+
+
 def get_selectable_artists():
     return [
         {
@@ -87,8 +102,15 @@ def select_artists():
     selected_artist_ids = session.get('selected_artists', [])
     error_message = None
     saved = request.args.get('saved') == '1'
+    cleared = request.args.get('cleared') == '1'
 
     if request.method == 'POST':
+        form_action = request.form.get('form_action')
+
+        if form_action == 'clear':
+            session.pop('selected_artists', None)
+            return redirect(url_for('select_artists', cleared='1'))
+
         selected_artist_ids = request.form.getlist('artists')
 
         selected_artist_ids = [
@@ -101,15 +123,23 @@ def select_artists():
         if len(selected_artist_ids) == 0:
             error_message = "Please select at least one artist before saving."
             saved = False
+            cleared = False
         else:
             session['selected_artists'] = selected_artist_ids
             return redirect(url_for('select_artists', saved='1'))
+
+    selected_artists = [
+        artist for artist in artists
+        if artist["id"] in selected_artist_ids
+    ]
 
     return render_template(
         'select-artists.html',
         artists=artists,
         selected_artist_ids=selected_artist_ids,
+        selected_artists=selected_artists,
         saved=saved,
+        cleared=cleared,
         error_message=error_message
     )
 
