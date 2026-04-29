@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Artists - Spurdle</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ url_for('static', filename='tailwind-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+
+<body class="bg-background-black text-white min-h-screen">
+    <main class="max-w-6xl mx-auto px-4 py-6 md:px-8 lg:px-12">
+        <header class="rounded-[28px] border border-white/10 bg-black/40 p-4 shadow-[0_0_30px_rgba(0,0,0,0.25)] md:p-6">
+            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <a href="/" class="inline-block">
+                    <h1 class="font-syne text-5xl leading-none md:text-6xl">
+                        <span class="text-white">spu</span><span class="text-neon-green">rdle</span>
+                    </h1>
+                </a>
+
+                <nav class="flex flex-wrap items-center gap-3 text-sm font-semibold md:gap-6">
+                    <a href="#" class="transition hover:text-neon-green">Leaderboard</a>
+                    <a href="#" class="transition hover:text-neon-green">Login</a>
+                    <a
+                        href="/"
+                        class="rounded-xl bg-neon-green px-4 py-2 text-black transition hover:scale-105"
+                    >
+                        Game
+                    </a>
+                </nav>
+            </div>
+
+            <div class="mt-8">
+                <p class="text-sm uppercase tracking-[0.35em] text-neon-green/80">artist setup</p>
+                <h2 class="mt-3 text-4xl font-bold md:text-5xl">Select your artists</h2>
+                <p class="mt-4 max-w-2xl text-sm leading-6 text-white/70 md:text-base">
+                    Choose artists you want to use for your Spurdle game.
+                </p>
+            </div>
+        </header>
+
+        <section class="mt-6 rounded-[28px] border border-white/10 bg-[#131318] p-4 md:p-6">
+            <form method="POST" action="#" class="mx-auto max-w-5xl">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h3 class="text-2xl font-bold md:text-3xl">Available Artists</h3>
+                        <p class="mt-1 text-sm text-white/55">
+                            Select up to 10 artists before starting the game.
+                        </p>
+                    </div>
+
+                    <p class="text-sm text-white/60">
+                        Rendered with Flask/Jinja
+                    </p>
+                </div>
+
+                <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {% for artist in artists %}
+                        <label class="cursor-pointer rounded-[24px] border border-white/10 bg-white/5 p-4 transition hover:border-neon-green hover:bg-neon-green/5">
+                            <div class="flex items-center gap-4">
+                                <input
+                                    type="checkbox"
+                                    name="artists"
+                                    value="{{ artist.id }}"
+                                    class="h-5 w-5 accent-neon-green"
+                                >
+
+                                <img
+                                    src="{{ artist.image }}"
+                                    alt="{{ artist.name }}"
+                                    class="h-16 w-16 rounded-full object-cover bg-black/20"
+                                    onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'"
+                                >
+
+                                <div class="min-w-0">
+                                    <p class="truncate text-lg font-bold text-white">
+                                        {{ artist.name }}
+                                    </p>
+                                    <p class="text-sm text-white/50">
+                                        {{ artist.genre }}
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-8 flex flex-col items-center gap-3">
+                    <button
+                        type="submit"
+                        class="w-full rounded-full bg-neon-green px-4 py-3 font-bold text-black transition hover:scale-105 md:w-64"
+                    >
+                        Continue
+                    </button>
+
+                    <p class="text-center text-sm text-white/50">
+                        Form submission will be connected in a later step.
+                    </p>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
