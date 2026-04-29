@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session
 import requests
 import random
 
@@ -14,7 +14,7 @@ def home():
     return render_template('main-game.html')
 
 
-@app.route('/select-artists')
+@app.route('/select-artists', methods=['GET', 'POST'])
 def select_artists():
     artists = [
         {
@@ -55,7 +55,31 @@ def select_artists():
         }
     ]
 
-    return render_template('select-artists.html', artists=artists)
+    valid_artist_ids = [artist["id"] for artist in artists]
+
+    if request.method == 'POST':
+        selected_artist_ids = request.form.getlist('artists')
+
+        selected_artist_ids = [
+            artist_id for artist_id in selected_artist_ids
+            if artist_id in valid_artist_ids
+        ]
+
+        selected_artist_ids = selected_artist_ids[:10]
+
+        session['selected_artists'] = selected_artist_ids
+
+        return redirect(url_for('select_artists', saved='1'))
+
+    selected_artist_ids = session.get('selected_artists', [])
+    saved = request.args.get('saved') == '1'
+
+    return render_template(
+        'select-artists.html',
+        artists=artists,
+        selected_artist_ids=selected_artist_ids,
+        saved=saved
+    )
 
 
 @app.route('/api/songs')
@@ -120,16 +144,20 @@ def filter_song_name(name):
         start = name.find('(')
         end = name.find(')') + 1
         name = name[:start] + name[end:]
+
     while '[' in name and ']' in name:
         start = name.find('[')
         end = name.find(']') + 1
         name = name[:start] + name[end:]
+
     while '{' in name and '}' in name:
         start = name.find('{')
         end = name.find('}') + 1
         name = name[:start] + name[end:]
+
     while '  ' in name:
         name = name.replace('  ', ' ')
+
     return name.strip()
 
 
@@ -177,9 +205,9 @@ def calculate_points():
 
     print(f"{user_guess} {song_name}")
 
-    if type_of_points == 0:  # 0 is Guess
+    if type_of_points == 0:
         current_points -= 3
-    elif type_of_points == 1:  # 1 is Hint
+    elif type_of_points == 1:
         if current_hint == 1:
             current_points -= 5
         elif current_hint == 2:
