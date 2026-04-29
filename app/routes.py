@@ -144,6 +144,19 @@ def select_artists():
     )
 
 
+@app.route('/api/selected-artists')
+def get_selected_artists():
+    artists = get_selectable_artists()
+    selected_artist_ids = session.get('selected_artists', [])
+
+    selected_artists = [
+        artist for artist in artists
+        if artist["id"] in selected_artist_ids
+    ]
+
+    return jsonify(selected_artists)
+
+
 @app.route('/api/songs')
 def get_songs():
     artist_name = request.args.get('artist')
