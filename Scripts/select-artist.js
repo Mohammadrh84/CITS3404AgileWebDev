@@ -4,6 +4,7 @@ const selectedArtists = document.getElementById("selectedArtists");
 const artistSearch = document.getElementById("artistSearch");
 const startButton = document.getElementById("startButton");
 const selectedArtistsSummary = document.getElementById("selectedArtistsSummary");
+const clearArtistsButton = document.getElementById("clearArtistsButton");
 
 const MAX_SELECTED_ARTISTS = 10;
 const chosenArtists = [];
@@ -63,12 +64,16 @@ function updateStartButton() {
     startButton.disabled = true;
     startButton.className =
       "mt-8 w-full rounded-full bg-white/10 px-4 py-3 font-bold text-white/40 cursor-not-allowed transition md:mx-auto md:block md:w-64";
+
+    clearArtistsButton.classList.add("hidden");
     return;
   }
 
   startButton.disabled = false;
   startButton.className =
     "mt-8 w-full rounded-full bg-neon-green px-4 py-3 font-bold text-black transition hover:scale-105 md:mx-auto md:block md:w-64";
+
+  clearArtistsButton.classList.remove("hidden");
 }
 
 function renderSelectedArtists() {
@@ -273,6 +278,17 @@ artistSearch.addEventListener(
 document.addEventListener("click", function (event) {
   if (!artistSearch.contains(event.target) && !searchResultsWrap.contains(event.target)) {
     hideSearchResults();
+  }
+});
+
+clearArtistsButton.addEventListener("click", function () {
+  chosenArtists.length = 0;
+  renderSelectedArtists();
+
+  const currentQuery = artistSearch.value.trim();
+
+  if (currentQuery) {
+    searchArtistsFromAPI(currentQuery);
   }
 });
 
