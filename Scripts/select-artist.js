@@ -77,6 +77,10 @@ function isAlreadySelected(artistId) {
   return chosenArtists.some((artist) => artist.id === artistId);
 }
 
+function hasReachedArtistLimit() {
+  return chosenArtists.length >= MAX_SELECTED_ARTISTS;
+}
+
 async function getArtistImageFromApple(artistId) {
   try {
     const url = `https://itunes.apple.com/lookup?id=${artistId}&entity=album&limit=1`;
@@ -182,17 +186,19 @@ function renderSelectedArtists() {
 
 function addArtist(artist) {
   if (isAlreadySelected(artist.id)) {
-    return;
+    return false;
   }
 
-  if (chosenArtists.length >= MAX_SELECTED_ARTISTS) {
+  if (hasReachedArtistLimit()) {
     renderSearchMessage(`You can only select up to ${MAX_SELECTED_ARTISTS} artists.`, true);
-    return;
+    return false;
   }
 
   chosenArtists.push(artist);
   saveSelectedArtists();
   renderSelectedArtists();
+
+  return true;
 }
 
 function renderSearchMessage(message, isError = false) {
@@ -208,6 +214,8 @@ function renderSearchMessage(message, isError = false) {
 function renderSearchResults(results) {
   searchResults.innerHTML = "";
 
+  const limitReached = hasReachedArtistLimit();
+
   results.forEach((artistData, index) => {
     const artist = {
       id: artistData.artistId,
@@ -216,17 +224,30 @@ function renderSearchResults(results) {
     };
 
     const alreadySelected = isAlreadySelected(artist.id);
+    const cannotAdd = alreadySelected || limitReached;
+
     const item = document.createElement("li");
 
     item.className = "px-4 py-3 border-b border-white/5 last:border-0";
 
     const imageId = `artist-image-${artist.id}-${index}`;
 
+    let statusText = "Tap to add";
+    let buttonText = "Add";
+
+    if (alreadySelected) {
+      statusText = "Already selected";
+      buttonText = "Selected";
+    } else if (limitReached) {
+      statusText = "Limit reached";
+      buttonText = "Max";
+    }
+
     item.innerHTML = `
       <button
         type="button"
-        class="w-full flex items-center justify-between gap-3 text-left ${alreadySelected ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:text-neon-green"}"
-        ${alreadySelected ? "disabled" : ""}
+        class="w-full flex items-center justify-between gap-3 text-left ${cannotAdd ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:text-neon-green"}"
+        ${cannotAdd ? "disabled" : ""}
       >
         <div class="flex items-center gap-3 min-w-0">
           <img
@@ -239,21 +260,26 @@ function renderSearchResults(results) {
           <div class="min-w-0">
             <p class="text-sm font-semibold text-white truncate">${artist.name}</p>
             <p class="text-xs text-white/45">
-              ${alreadySelected ? "Already selected" : "Tap to add"}
+              ${statusText}
             </p>
           </div>
         </div>
 
         <span class="shrink-0 text-xs font-semibold ${alreadySelected ? "text-neon-green" : "text-white/45"}">
-          ${alreadySelected ? "Selected" : "Add"}
+          ${buttonText}
         </span>
       </button>
     `;
 
     const button = item.querySelector("button");
 
-    if (!alreadySelected) {
+    if (!cannotAdd) {
       button.addEventListener("click", async function () {
+        if (hasReachedArtistLimit()) {
+          renderSearchMessage(`You can only select up to ${MAX_SELECTED_ARTISTS} artists.`, true);
+          return;
+        }
+
         const status = button.querySelector("span:last-child");
 
         if (status) {
@@ -262,10 +288,12 @@ function renderSearchResults(results) {
 
         artist.image = await getArtistImageFromApple(artist.id);
 
-        addArtist(artist);
+        const wasAdded = addArtist(artist);
 
-        artistSearch.value = "";
-        hideSearchResults();
+        if (wasAdded) {
+          artistSearch.value = "";
+          hideSearchResults();
+        }
       });
     }
 
