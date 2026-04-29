@@ -281,7 +281,8 @@ startButton.addEventListener("click", function () {
     return;
   }
 
-  console.log("Selected artists:", chosenArtists);
+  localStorage.setItem("selectedArtists", JSON.stringify(chosenArtists));
+  window.location.href = "main-game.html";
 });
 
 renderSelectedArtists();
