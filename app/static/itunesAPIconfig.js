@@ -1,10 +1,19 @@
 let cacheArtistName = "Taylor Swift";
+let cacheArtistId = null;
 let selectedArtists = [];
 
 let listOfSongNames = [];
 let snippetStartTime = 0;
 
 let cacheArtistImage = null;
+
+const FALLBACK_ARTIST = {
+    id: "159260351",
+    name: "Taylor Swift",
+    image: "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
+};
+
+const FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -22,7 +31,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function loadSelectedArtists() {
     try {
         const response = await fetch('/api/selected-artists');
-        selectedArtists = await response.json();
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+            selectedArtists = data;
+        } else {
+            selectedArtists = [];
+        }
     } catch (error) {
         console.error("Could not load selected artists:", error);
         selectedArtists = [];
@@ -32,20 +47,61 @@ async function loadSelectedArtists() {
 
 function chooseRandomArtist() {
     if (!selectedArtists || selectedArtists.length === 0) {
-        cacheArtistName = "Taylor Swift";
+        cacheArtistName = FALLBACK_ARTIST.name;
+        cacheArtistId = FALLBACK_ARTIST.id;
+        cacheArtistImage = FALLBACK_ARTIST.image;
         return;
     }
 
     const randomArtist = selectedArtists[Math.floor(Math.random() * selectedArtists.length)];
-    cacheArtistName = randomArtist.name;
+
+    cacheArtistName = randomArtist.name || FALLBACK_ARTIST.name;
+    cacheArtistId = randomArtist.id || null;
+    cacheArtistImage = randomArtist.image || FALLBACK_ARTIST_IMAGE;
+}
+
+
+function getArtistParams() {
+    const params = new URLSearchParams();
+
+    if (cacheArtistId) {
+        params.set('artist_id', cacheArtistId);
+    }
+
+    params.set('artist', cacheArtistName);
+
+    return params.toString();
+}
+
+
+function setTextIfElementExists(elementId, text) {
+    const element = document.getElementById(elementId);
+
+    if (element) {
+        element.textContent = text;
+    }
+}
+
+
+function setImageIfElementExists(elementId, imageUrl) {
+    const element = document.getElementById(elementId);
+
+    if (element) {
+        element.src = imageUrl || FALLBACK_ARTIST_IMAGE;
+    }
 }
 
 
 async function GetRandomSong() {
-    const res = await fetch('/api/random-song?artist=' + encodeURIComponent(cacheArtistName));
+    const res = await fetch('/api/random-song?' + getArtistParams());
     const songDeets = await res.json();
 
-    document.getElementById('artist-name').textContent = cacheArtistName;
+    if (songDeets.error) {
+        console.error(songDeets.error);
+        return;
+    }
+
+    setTextIfElementExists('artist-name', cacheArtistName);
 
     const [artwork, albumName, releaseDate] = await Promise.all([
         fetch('/api/song-details?argument=artworkUrl100').then(r => r.json()),
@@ -53,22 +109,44 @@ async function GetRandomSong() {
         fetch('/api/song-details?argument=releaseDate').then(r => r.json())
     ]);
 
-    document.getElementById('album-cover').src = artwork.value;
-    document.getElementById('album-name').textContent = albumName.value;
-    document.getElementById('release-date').textContent = new Date(releaseDate.value).toLocaleDateString('en-GB', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
+    setImageIfElementExists('album-cover', artwork.value);
+    setTextIfElementExists('album-name', albumName.value || "Unknown album");
 
-    const imgRes = await fetch('/api/artist-image?artist=' + encodeURIComponent(cacheArtistName));
-    const imgData = await imgRes.json();
+    if (releaseDate.value) {
+        const formattedDate = new Date(releaseDate.value).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
 
-    document.getElementById('artist-image').src = imgData.image;
-    cacheArtistImage = imgData.image;
+        setTextIfElementExists('release-date', formattedDate);
+    } else {
+        setTextIfElementExists('release-date', "Unknown release date");
+    }
 
-    const songsRes = await fetch('/api/songs?artist=' + encodeURIComponent(cacheArtistName));
-    listOfSongNames = await songsRes.json();
+    if (!cacheArtistImage || cacheArtistImage === FALLBACK_ARTIST_IMAGE) {
+        try {
+            const imgRes = await fetch('/api/artist-image?artist=' + encodeURIComponent(cacheArtistName));
+            const imgData = await imgRes.json();
+
+            if (imgData.image) {
+                cacheArtistImage = imgData.image;
+            }
+        } catch (error) {
+            console.error("Could not load artist image:", error);
+        }
+    }
+
+    setImageIfElementExists('artist-image', cacheArtistImage);
+
+    const songsRes = await fetch('/api/songs?' + getArtistParams());
+    const songsData = await songsRes.json();
+
+    if (Array.isArray(songsData)) {
+        listOfSongNames = songsData;
+    } else {
+        listOfSongNames = [];
+    }
 }
 
 
@@ -87,6 +165,11 @@ let currentGuess = 0;
 
 async function isSongCorrect(Guess) {
     const { value } = await fetch('/api/song-details?argument=trackName').then(r => r.json());
+
+    if (!value) {
+        return false;
+    }
+
     const filteredSong = filterSongName(value).toLowerCase();
     const filteredGuess = filterSongName(Guess).toLowerCase();
 
@@ -101,13 +184,15 @@ async function isSongCorrect(Guess) {
 
     const { GuessStatus, CurrentPoints, GameStatus } = await fetch(`/api/points?${params}`).then(r => r.json());
 
-    document.getElementById('current-points').textContent = CurrentPoints;
+    setTextIfElementExists('current-points', CurrentPoints);
 
     if (GameStatus) {
-        document.getElementById('your-score').textContent = CurrentPoints;
-        document.getElementById('total-points').textContent = "test";
-        showResultsOverlay();
+        setTextIfElementExists('your-score', CurrentPoints);
+        setTextIfElementExists('total-points', "test");
+
+        await showResultsOverlay(GuessStatus);
         await fetch('/api/reset');
+
         return GuessStatus;
     }
 
@@ -129,12 +214,9 @@ document.getElementById('guess-button').addEventListener('click', async function
 
     const p = document.createElement('p');
 
-    p.classList.add("mt-1", "text-sm", "rounded-full", "py-2", "px-4");
-
     if (result) {
         p.textContent = "✓  " + userGuess;
         p.className = "mt-1 text-sm rounded-full py-2 px-4 text-neon-green bg-neon-green/5 border border-neon-green/20";
-        showResultsOverlay(true);
     } else {
         p.textContent = "✕  " + userGuess;
         p.className = "mt-1 text-sm rounded-full py-2 px-4 text-[#ff4a6e] border border-[#ff4a6e]/50 bg-[#ff4a6e1f]";
@@ -173,7 +255,7 @@ async function NextHint() {
 
     currentHint++;
 
-    document.getElementById('hints-revealed').textContent = `${currentHint} / 5 Revealed`;
+    setTextIfElementExists('hints-revealed', `${currentHint} / 5 Revealed`);
 
     if (currentHint === 3) {
         UpdateLettersHint();
@@ -188,7 +270,7 @@ async function NextHint() {
 
     const { CurrentPoints } = await fetch(`/api/points?${params}`).then(r => r.json());
 
-    document.getElementById('current-points').textContent = CurrentPoints;
+    setTextIfElementExists('current-points', CurrentPoints);
 }
 
 
@@ -236,6 +318,11 @@ async function UpdateLettersHint() {
 
 async function playSnippet() {
     const { value } = await fetch('/api/song-details?argument=previewUrl').then(r => r.json());
+
+    if (!value) {
+        return;
+    }
+
     const audio = new Audio(value);
 
     audio.currentTime = snippetStartTime;
@@ -252,19 +339,20 @@ async function showResultsOverlay(results) {
     const overlayTitle = document.getElementById('overlay-title');
     const overlaySubTitle = document.getElementById('overlay-subtitle');
 
-    document.getElementById('artist-image-result').src = cacheArtistImage;
-    document.getElementById('artist-name-results').textContent = cacheArtistName;
+    setImageIfElementExists('artist-image-result', cacheArtistImage);
+    setTextIfElementExists('artist-name-results', cacheArtistName);
 
     const { value } = await fetch('/api/song-details?argument=trackName').then(r => r.json());
 
-    document.getElementById('song-name-results').textContent = value;
+    setTextIfElementExists('song-name-results', value || "Unknown song");
 
     if (results) {
         overlayTitle.textContent = "You did it!";
         overlaySubTitle.textContent = "Play again and see if you can get a streak going!";
     } else {
-        document.getElementById('your-score').textContent = 0;
-        document.getElementById('total-points').textContent = "test";
+        setTextIfElementExists('your-score', 0);
+        setTextIfElementExists('total-points', "test");
+
         overlayTitle.textContent = "Oops! Dont worry you cant win them all.";
         overlaySubTitle.textContent = "Try again, you got the next one!";
     }

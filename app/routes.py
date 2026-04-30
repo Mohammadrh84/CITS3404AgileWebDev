@@ -1,12 +1,16 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import render_template, jsonify, request, redirect, url_for, session, flash
+import json
 import requests
 import random
+
+from app import app
 
 letters_correct = set()
 letters_wrong = set()
 random_song_details = {}
 
-from app import app
+FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
+MAX_SELECTED_ARTISTS = 10
 
 
 @app.route('/')
@@ -29,118 +33,239 @@ def sign_up():
     return render_template('sign-up.html')
 
 
-def get_selectable_artists():
-    return [
-        {"id": "taylor-swift", "name": "Taylor Swift", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "ed-sheeran", "name": "Ed Sheeran", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "adele", "name": "Adele", "genre": "Pop/Soul", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "drake", "name": "Drake", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "the-weeknd", "name": "The Weeknd", "genre": "R&B/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "billie-eilish", "name": "Billie Eilish", "genre": "Alternative", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "bruno-mars", "name": "Bruno Mars", "genre": "Pop/Funk", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "ariana-grande", "name": "Ariana Grande", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "justin-bieber", "name": "Justin Bieber", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "beyonce", "name": "Beyoncé", "genre": "R&B/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "dua-lipa", "name": "Dua Lipa", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "post-malone", "name": "Post Malone", "genre": "Hip-Hop/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "harry-styles", "name": "Harry Styles", "genre": "Pop/Rock", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "olivia-rodrigo", "name": "Olivia Rodrigo", "genre": "Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "rihanna", "name": "Rihanna", "genre": "R&B/Pop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "eminem", "name": "Eminem", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "kendrick-lamar", "name": "Kendrick Lamar", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "sza", "name": "SZA", "genre": "R&B", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "coldplay", "name": "Coldplay", "genre": "Alternative/Rock", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "imagine-dragons", "name": "Imagine Dragons", "genre": "Alternative/Rock", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "bad-bunny", "name": "Bad Bunny", "genre": "Latin", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "travis-scott", "name": "Travis Scott", "genre": "Hip-Hop", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "doja-cat", "name": "Doja Cat", "genre": "Pop/Rap", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"},
-        {"id": "lana-del-rey", "name": "Lana Del Rey", "genre": "Alternative", "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"}
-    ]
+def get_artist_image_from_itunes(artist_id):
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/lookup",
+            params={
+                "id": artist_id,
+                "entity": "album",
+                "limit": 3
+            },
+            timeout=6
+        )
+
+        data = response.json()
+
+        for result in data.get("results", []):
+            artwork_url = result.get("artworkUrl100")
+
+            if artwork_url:
+                return artwork_url.replace("100x100bb", "600x600bb")
+
+    except (requests.RequestException, ValueError):
+        pass
+
+    return FALLBACK_ARTIST_IMAGE
+
+
+def get_itunes_artist_id(artist_name, artist_id=None):
+    if artist_id:
+        return artist_id
+
+    if not artist_name:
+        return None
+
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/search",
+            params={
+                "term": artist_name,
+                "entity": "musicArtist",
+                "limit": 1
+            },
+            timeout=8
+        )
+
+        results = response.json().get("results", [])
+
+        if len(results) == 0:
+            return None
+
+        return results[0].get("artistId")
+
+    except (requests.RequestException, ValueError):
+        return None
+
+
+def clean_selected_artist(artist):
+    if not isinstance(artist, dict):
+        return None
+
+    artist_id = str(artist.get("id", "")).strip()
+    artist_name = str(artist.get("name", "")).strip()
+    artist_image = str(artist.get("image", FALLBACK_ARTIST_IMAGE)).strip()
+
+    if not artist_id or not artist_name:
+        return None
+
+    if not artist_image:
+        artist_image = FALLBACK_ARTIST_IMAGE
+
+    return {
+        "id": artist_id,
+        "name": artist_name,
+        "image": artist_image
+    }
+
+
+def parse_selected_artists(raw_selected_artists):
+    try:
+        artists = json.loads(raw_selected_artists)
+    except (TypeError, ValueError):
+        return []
+
+    if not isinstance(artists, list):
+        return []
+
+    selected_artists = []
+    seen_artist_ids = set()
+
+    for artist in artists:
+        clean_artist = clean_selected_artist(artist)
+
+        if clean_artist is None:
+            continue
+
+        if clean_artist["id"] in seen_artist_ids:
+            continue
+
+        selected_artists.append(clean_artist)
+        seen_artist_ids.add(clean_artist["id"])
+
+        if len(selected_artists) == MAX_SELECTED_ARTISTS:
+            break
+
+    return selected_artists
+
+
+@app.route('/api/search-artists')
+def search_artists():
+    search_term = request.args.get('term', '').strip()
+
+    if len(search_term) == 0:
+        return jsonify([])
+
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/search",
+            params={
+                "term": search_term,
+                "entity": "musicArtist",
+                "limit": 8
+            },
+            timeout=6
+        )
+
+        data = response.json()
+
+    except (requests.RequestException, ValueError):
+        return jsonify({"error": "Could not search artists."}), 500
+
+    artists = []
+    seen_artist_ids = set()
+
+    for artist_data in data.get("results", []):
+        artist_id = str(artist_data.get("artistId", "")).strip()
+        artist_name = str(artist_data.get("artistName", "")).strip()
+
+        if not artist_id or not artist_name:
+            continue
+
+        if artist_id in seen_artist_ids:
+            continue
+
+        artists.append({
+            "id": artist_id,
+            "name": artist_name,
+            "image": FALLBACK_ARTIST_IMAGE
+        })
+
+        seen_artist_ids.add(artist_id)
+
+    return jsonify(artists)
+
+
+@app.route('/api/artist-image-by-id')
+def artist_image_by_id():
+    artist_id = request.args.get('artist_id', '').strip()
+
+    if not artist_id:
+        return jsonify({"image": FALLBACK_ARTIST_IMAGE})
+
+    return jsonify({
+        "image": get_artist_image_from_itunes(artist_id)
+    })
 
 
 @app.route('/select-artists', methods=['GET', 'POST'])
 def select_artists():
-    artists = get_selectable_artists()
-    valid_artist_ids = [artist["id"] for artist in artists]
-
-    selected_artist_ids = session.get('selected_artists', [])
+    selected_artists = session.get('selected_artists', [])
     error_message = None
-    saved = request.args.get('saved') == '1'
-    cleared = request.args.get('cleared') == '1'
 
     if request.method == 'POST':
         form_action = request.form.get('form_action')
 
         if form_action == 'clear':
             session.pop('selected_artists', None)
-            return redirect(url_for('select_artists', cleared='1'))
+            flash("Selected artists cleared.", "neutral")
+            return redirect(url_for('select_artists'))
 
-        selected_artist_ids = request.form.getlist('artists')
+        selected_artists = parse_selected_artists(
+            request.form.get('selected_artists_json', '[]')
+        )
 
-        selected_artist_ids = [
-            artist_id for artist_id in selected_artist_ids
-            if artist_id in valid_artist_ids
-        ]
-
-        if len(selected_artist_ids) == 0:
+        if len(selected_artists) == 0:
             error_message = "Please select at least one artist before saving."
-            saved = False
-            cleared = False
-        elif len(selected_artist_ids) > 10:
-            error_message = "Please select no more than 10 artists."
-            saved = False
-            cleared = False
-            selected_artist_ids = selected_artist_ids[:10]
         else:
-            session['selected_artists'] = selected_artist_ids
-            return redirect(url_for('select_artists', saved='1'))
-
-    selected_artists = [
-        artist for artist in artists
-        if artist["id"] in selected_artist_ids
-    ]
+            session['selected_artists'] = selected_artists
+            flash("Selected artists saved.", "success")
+            return redirect(url_for('select_artists'))
 
     return render_template(
         'select-artists.html',
-        artists=artists,
-        selected_artist_ids=selected_artist_ids,
         selected_artists=selected_artists,
-        saved=saved,
-        cleared=cleared,
+        max_selected_artists=MAX_SELECTED_ARTISTS,
         error_message=error_message
     )
 
 
 @app.route('/api/selected-artists')
 def get_selected_artists():
-    artists = get_selectable_artists()
-    selected_artist_ids = session.get('selected_artists', [])
-
-    selected_artists = [
-        artist for artist in artists
-        if artist["id"] in selected_artist_ids
-    ]
-
-    if len(selected_artists) == 0:
-        selected_artists = artists
-
+    selected_artists = session.get('selected_artists', [])
     return jsonify(selected_artists)
 
 
 @app.route('/api/songs')
 def get_songs():
     artist_name = request.args.get('artist')
+    artist_id = request.args.get('artist_id')
 
-    search_url = f"https://itunes.apple.com/search?term={artist_name}&entity=musicArtist&limit=1"
-    artist_id = requests.get(search_url).json()['results'][0]['artistId']
+    artist_id = get_itunes_artist_id(artist_name, artist_id)
 
-    songs_url = f"https://itunes.apple.com/lookup?id={artist_id}&entity=song&limit=200"
-    results = requests.get(songs_url).json()['results']
+    if not artist_id:
+        return jsonify([])
+
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/lookup",
+            params={
+                "id": artist_id,
+                "entity": "song",
+                "limit": 200
+            },
+            timeout=10
+        )
+
+        results = response.json().get('results', [])
+
+    except (requests.RequestException, ValueError):
+        return jsonify([])
 
     names = [
-        s['trackName']
-        for s in results
-        if s.get('wrapperType') == 'track' and s.get('artistId') == artist_id
+        song['trackName']
+        for song in results
+        if song.get('wrapperType') == 'track' and str(song.get('artistId')) == str(artist_id)
     ]
 
     return jsonify(names)
@@ -154,18 +279,36 @@ def random_song():
     letters_wrong.clear()
 
     artist_name = request.args.get('artist')
+    artist_id = request.args.get('artist_id')
 
-    search_url = f"https://itunes.apple.com/search?term={artist_name}&entity=musicArtist&limit=1"
-    artist_res = requests.get(search_url).json()
-    artist_id = artist_res['results'][0]['artistId']
+    artist_id = get_itunes_artist_id(artist_name, artist_id)
 
-    songs_url = f"https://itunes.apple.com/lookup?id={artist_id}&entity=song&limit=200"
-    songs_res = requests.get(songs_url).json()
+    if not artist_id:
+        return jsonify({"error": "No artist found."}), 404
+
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/lookup",
+            params={
+                "id": artist_id,
+                "entity": "song",
+                "limit": 200
+            },
+            timeout=10
+        )
+
+        results = response.json().get('results', [])
+
+    except (requests.RequestException, ValueError):
+        return jsonify({"error": "Could not load songs."}), 500
 
     songs = [
-        s for s in songs_res['results']
-        if s.get('wrapperType') == 'track' and s.get('artistId') == artist_id
+        song for song in results
+        if song.get('wrapperType') == 'track' and str(song.get('artistId')) == str(artist_id)
     ]
+
+    if len(songs) == 0:
+        return jsonify({"error": "No songs found for this artist."}), 404
 
     random_song_details = random.choice(songs)
 
