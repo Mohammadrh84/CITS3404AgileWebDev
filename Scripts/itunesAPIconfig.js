@@ -4,6 +4,9 @@ const savedArtists = JSON.parse(localStorage.getItem("selectedArtists")) || [];
 let listOfArtists = [];
 for (let i = 0; i < savedArtists.length; i++) {
     listOfArtists.push(savedArtists[i].name);}
+
+if (listOfArtists.length === 0) {
+        window.location.href = "./select-artist.html";}
 let listOfSongNames = [];
 let cacheSongDeets = null;
 let lettersInSong = [];
