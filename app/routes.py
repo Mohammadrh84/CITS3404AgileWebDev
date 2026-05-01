@@ -1,9 +1,9 @@
-from flask import render_template, jsonify, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session, flash
 import json
 import requests
 import random
 
-from app import app
+bp = Blueprint('main', __name__)
 
 letters_correct = set()
 letters_wrong = set()
@@ -13,25 +13,25 @@ FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Por
 MAX_SELECTED_ARTISTS = 10
 
 
-@app.route('/')
+@bp.route('/')
 def welcome():
     return render_template('welcome.html')
 
-@app.route('/main_game')
+@bp.route('/main_game')
 def main_game():
     return render_template('main-game.html')
 
-@app.route('/leaderboard')
+@bp.route('/leaderboard')
 def leaderboard():
     return render_template('leaderboard.html')
 
 
-@app.route('/sign_in')
+@bp.route('/sign_in')
 def sign_in():
     return render_template('sign-in.html')
 
 
-@app.route('/sign_up')
+@bp.route('/sign_up')
 def sign_up():
     return render_template('sign-up.html')
 
@@ -142,7 +142,7 @@ def parse_selected_artists(raw_selected_artists):
     return selected_artists
 
 
-@app.route('/api/search-artists')
+@bp.route('/api/search-artists')
 def search_artists():
     search_term = request.args.get('term', '').strip()
 
@@ -189,7 +189,7 @@ def search_artists():
     return jsonify(artists)
 
 
-@app.route('/api/artist-image-by-id')
+@bp.route('/api/artist-image-by-id')
 def artist_image_by_id():
     artist_id = request.args.get('artist_id', '').strip()
 
@@ -201,7 +201,7 @@ def artist_image_by_id():
     })
 
 
-@app.route('/select_artists', methods=['GET', 'POST'])
+@bp.route('/select_artists', methods=['GET', 'POST'])
 def select_artists():
     selected_artists = session.get('selected_artists', [])
     error_message = None
@@ -212,7 +212,7 @@ def select_artists():
         if form_action == 'clear':
             session.pop('selected_artists', None)
             flash("Selected artists cleared.", "neutral")
-            return redirect(url_for('select_artists'))
+            return redirect(url_for('main.select_artists'))
 
         selected_artists = parse_selected_artists(
             request.form.get('selected_artists_json', '[]')
@@ -223,7 +223,7 @@ def select_artists():
         else:
             session['selected_artists'] = selected_artists
             flash("Selected artists saved.", "success")
-            return redirect(url_for('select_artists'))
+            return redirect(url_for('main.select_artists'))
 
     return render_template(
         'select-artists.html',
@@ -233,13 +233,13 @@ def select_artists():
     )
 
 
-@app.route('/api/selected-artists')
+@bp.route('/api/selected-artists')
 def get_selected_artists():
     selected_artists = session.get('selected_artists', [])
     return jsonify(selected_artists)
 
 
-@app.route('/api/songs')
+@bp.route('/api/songs')
 def get_songs():
     artist_name = request.args.get('artist')
     artist_id = request.args.get('artist_id')
@@ -274,7 +274,7 @@ def get_songs():
     return jsonify(names)
 
 
-@app.route('/api/random-song')
+@bp.route('/api/random-song')
 def random_song():
     global random_song_details
 
@@ -318,13 +318,13 @@ def random_song():
     return jsonify(random_song_details)
 
 
-@app.route('/api/song-details')
+@bp.route('/api/song-details')
 def song_details():
     argument = request.args.get('argument')
     return jsonify({"value": random_song_details.get(argument)})
 
 
-@app.route('/api/artist-image')
+@bp.route('/api/artist-image')
 def artist_image():
     artist = request.args.get('artist')
 
@@ -361,7 +361,7 @@ def filter_song_name(name):
     return name.strip()
 
 
-@app.route('/api/check-letters')
+@bp.route('/api/check-letters')
 def check_Letters():
     users_guess = request.args.get('user-guess')
     filtered_guess = users_guess.lower().replace(" ", "")
@@ -381,7 +381,7 @@ def check_Letters():
     })
 
 
-@app.route('/api/current-letters')
+@bp.route('/api/current-letters')
 def Send_current_letters():
     return jsonify({
         "correct": list(letters_correct),
@@ -393,7 +393,7 @@ current_points = 100
 num_guesses = 0
 
 
-@app.route('/api/points')
+@bp.route('/api/points')
 def calculate_points():
     global current_points
     global num_guesses
@@ -441,7 +441,7 @@ def calculate_points():
     })
 
 
-@app.route('/api/reset')
+@bp.route('/api/reset')
 def reset_game():
     global current_points
 
@@ -450,7 +450,3 @@ def reset_game():
     letters_wrong.clear()
 
     return jsonify({"message": "Game reset successfully"})
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
