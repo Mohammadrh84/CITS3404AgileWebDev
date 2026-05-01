@@ -12,9 +12,10 @@ class User(db.Model):
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    score = db.Column(db.Integer, default=0)
-    guesses = db.Column(db.Integer, default=0)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # corresponding user
+    score = db.Column(db.Integer, default=0) # how many points were awarded
+    hints = db.Column(db.Integer, default=0) # how many hints were used?
+    guesses = db.Column(db.Integer, default=0) # how many guessses they made
     correct = db.Column(db.Boolean) # whether they correctly guessed the song in that game
 
 
@@ -22,6 +23,6 @@ class Stats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
     total_points = db.Column(db.Integer, default=0) # add to this value after each game
-    accuracy = db.Column(db.Float, default=0)
+    accuracy = db.Column(db.Float, default=0) # what is accuracy based on? 
     games_played = db.Column(db.Integer, default=0) # increment by 1 for each game record
-    avg_hints = db.Column(db.Float, default=0)
+    avg_hints = db.Column(db.Float, default=0) # will be calculating by a running average

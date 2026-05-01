@@ -25,9 +25,12 @@
                             Start Game
                         </button>
                     </a>
-                    <button class="font-montserrat font-semibold bg-white text-background-black px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-200" onclick="goToLeaderboard()">
-                        Leaderboard
-                    </button>
+
+                    <a href="{{ url_for('main.leaderboard') }}">
+                        <button class="font-montserrat font-semibold bg-white text-background-black px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-200" onclick="goToLeaderboard()">
+                            Leaderboard
+                        </button>
+                    </a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-12 max-w-4xl">
