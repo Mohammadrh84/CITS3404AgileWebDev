@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session, flash
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 import json
 import requests
@@ -20,6 +20,7 @@ def welcome():
 
 
 @bp.route('/main_game')
+@login_required
 def main_game():
     return render_template('main_game.html')
 
@@ -195,6 +196,7 @@ def artist_image_by_id():
 
 
 @bp.route('/select_artists', methods=['GET', 'POST'])
+@login_required
 def select_artists():
     selected_artists = session.get('selected_artists', [])
     error_message = None
