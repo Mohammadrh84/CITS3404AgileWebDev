@@ -497,13 +497,28 @@ def save_score():
 
     data = request.get_json() or {}
 
-    score = safe_int(data.get('score'), 0)
+    client_score = safe_int(data.get('score'), 0)
     hints = safe_int(data.get('hints'), 0)
     guesses = safe_int(data.get('guesses'), 0)
     correct = bool(data.get('correct', False))
 
+    # Browser/client data can be changed, so use the server-side session
+    # points as the maximum trusted score.
+    server_points = safe_int(session.get('current_points'), 0)
+
+    score = client_score
+
+    if score > server_points:
+        score = server_points
+
     if score < 0:
         score = 0
+
+    if hints < 0:
+        hints = 0
+
+    if guesses < 0:
+        guesses = 0
 
     game = Game(
         user_id=current_user.id,
