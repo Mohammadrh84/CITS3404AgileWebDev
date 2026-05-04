@@ -235,8 +235,6 @@ def select_artists():
             SelectedArtist.query.filter_by(user_id=current_user.id).delete()
             db.session.commit()
 
-            session.pop('selected_artists', None)
-
             flash("Selected artists cleared.", "neutral")
             return redirect(url_for('main.select_artists'))
 
@@ -248,10 +246,6 @@ def select_artists():
             error_message = "Please select at least one artist before saving."
         else:
             replace_saved_selected_artists_for_current_user(selected_artists)
-
-            # Keep session copy temporarily so the current game flow still works.
-            # Step 4C will update the API to load directly from the database.
-            session['selected_artists'] = selected_artists
 
             flash("Selected artists saved.", "success")
             return redirect(url_for('main.select_artists'))
@@ -265,8 +259,9 @@ def select_artists():
 
 
 @bp.route('/api/selected-artists')
+@login_required
 def get_selected_artists():
-    return jsonify(session.get('selected_artists', []))
+    return jsonify(get_saved_selected_artists_for_current_user())
 
 
 @bp.route('/api/songs')
@@ -305,6 +300,7 @@ def get_songs():
 
 
 @bp.route('/api/random-song')
+@login_required
 def random_song():
     session['letters_correct'] = []
     session['letters_wrong'] = []
@@ -350,6 +346,7 @@ def random_song():
 
 
 @bp.route('/api/song-details')
+@login_required
 def song_details():
     argument = request.args.get('argument')
     return jsonify({
@@ -412,6 +409,7 @@ def filter_song_name(name):
 
 
 @bp.route('/api/check-letters')
+@login_required
 def check_Letters():
     users_guess = request.args.get('user-guess', '')
     filtered_guess = users_guess.lower().replace(" ", "")
@@ -442,6 +440,7 @@ def check_Letters():
 
 
 @bp.route('/api/current-letters')
+@login_required
 def Send_current_letters():
     return jsonify({
         "correct": session.get('letters_correct', []),
@@ -450,6 +449,7 @@ def Send_current_letters():
 
 
 @bp.route('/api/points')
+@login_required
 def calculate_points():
     current_points = session.get('current_points', 100)
     num_guesses = session.get('num_guesses', 0)
@@ -525,12 +525,8 @@ def calculate_current_streak(user_id):
 
 
 @bp.route('/api/save-score', methods=['POST'])
+@login_required
 def save_score():
-    if not current_user.is_authenticated:
-        return jsonify({
-            "error": "You must be logged in to save a score."
-        }), 401
-
     data = request.get_json() or {}
 
     client_score = safe_int(data.get('score'), 0)
@@ -625,6 +621,7 @@ def leaderboard_data():
 
 
 @bp.route('/api/reset')
+@login_required
 def reset_game():
     session['current_points'] = 100
     session['num_guesses'] = 0
