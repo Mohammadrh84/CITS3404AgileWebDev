@@ -14,14 +14,14 @@
 
 <body class="bg-background-black bg-cover bg-center bg-no-repeat">
     <nav class="flex items-center justify-between px-8 border-b border-white/10">
-        <a href="{{ url_for('main_game') }}" class="font-syne text-[35px] text-white cursor-pointer">
+        <a href="{{ url_for('main.main_game') }}" class="font-syne text-[35px] text-white cursor-pointer">
             <span class="text-white">spu</span><span class="text-neon-green">rdle</span>
         </a>
 
         <div class="flex items-center gap-6 font-semibold text-sm">
-            <a href="{{ url_for('leaderboard') }}" class="text-white transition hover:text-neon-green">Leaderboard</a>
+            <a href="{{ url_for('main.leaderboard') }}" class="text-white transition hover:text-neon-green">Leaderboard</a>
             <a href="#" class="text-white transition hover:text-neon-green">My Account</a>
-            <a href="{{ url_for('select_artists') }}" class="rounded-full bg-neon-green px-4 py-2 text-black transition hover:scale-105">
+            <a href="{{ url_for('main.select_artists') }}" class="rounded-full bg-neon-green px-4 py-2 text-black transition hover:scale-105">
                 Artist Select
             </a>
         </div>
@@ -324,7 +324,7 @@
             </section>
 
             <!-- BUTTONS -->
-            <a href="{{ url_for('select_artists') }}"
+            <a href="{{ url_for('main.select_artists') }}"
                 class="inline-block bg-white/5 text-white border border-white/20 py-3 px-6 rounded-[28px] hover:shadow-[0_0_10px_#3Dff6e] transition-all duration-200">
                 Select Artists
             </a>

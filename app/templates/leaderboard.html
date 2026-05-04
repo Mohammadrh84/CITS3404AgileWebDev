@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Spurdle</title>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='leaderboard.js') }}"></script>
     <script src="{{ url_for('static', filename='tailwind-config.js') }}"></script>
 
-    <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
   <body class="bg-background-black text-white">
@@ -17,17 +18,17 @@
       <div class="mx-auto max-w-6xl">
         <header class="rounded-[28px] border border-white/10 bg-black/40 p-4 shadow-[0_0_30px_rgba(0,0,0,0.25)] md:p-6">
           <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <a href="welcome.html" class="inline-block">
+            <a href="{{ url_for('main.select_artists') }}" class="inline-block">
               <h1 class="font-syne text-5xl leading-none md:text-6xl">
                 <span class="text-white">spu</span><span class="text-neon-green">rdle</span>
               </h1>
             </a>
 
             <nav class="flex flex-wrap items-center gap-3 text-sm font-semibold md:gap-6">
-              <a href="leaderboard.html" class="text-neon-green">Leaderboard</a>
+              <a href="{{ url_for('main.leaderboard') }}" class="text-neon-green">Leaderboard</a>
               <a href="#" class="transition hover:text-neon-green">My Account</a>
               <a
-                href="#"
+                href="{{ url_for('main.main_game') }}"
                 class="rounded-xl bg-neon-green px-4 py-2 text-black transition hover:scale-105"
               >
                 Play now
