@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session, flash
 from flask_login import current_user, login_required
+from sqlalchemy import func
 
 import json
 import requests
@@ -532,7 +533,7 @@ def save_score():
     client_score = safe_int(data.get('score'), 0)
     hints = safe_int(data.get('hints'), 0)
     guesses = safe_int(data.get('guesses'), 0)
-    correct = bool(data.get('correct', False))
+    correct = data.get('correct', False) is True
 
     server_points = safe_int(session.get('current_points'), 0)
 
@@ -559,6 +560,7 @@ def save_score():
     )
 
     db.session.add(game)
+    db.session.flush()
 
     stats = Stats.query.filter_by(user_id=current_user.id).first()
 
@@ -572,16 +574,34 @@ def save_score():
         )
         db.session.add(stats)
 
-    old_games_played = stats.games_played or 0
-    old_correct_games = round((stats.accuracy or 0) * old_games_played)
+    games_played = (
+        Game.query
+        .filter_by(user_id=current_user.id)
+        .count()
+    )
 
-    new_games_played = old_games_played + 1
-    new_correct_games = old_correct_games + (1 if correct else 0)
+    correct_games = (
+        Game.query
+        .filter_by(user_id=current_user.id, correct=True)
+        .count()
+    )
 
-    stats.total_points = (stats.total_points or 0) + score
-    stats.games_played = new_games_played
-    stats.accuracy = new_correct_games / new_games_played
-    stats.avg_hints = (((stats.avg_hints or 0) * old_games_played) + hints) / new_games_played
+    total_points = (
+        db.session.query(func.coalesce(func.sum(Game.score), 0))
+        .filter(Game.user_id == current_user.id)
+        .scalar()
+    )
+
+    avg_hints = (
+        db.session.query(func.coalesce(func.avg(Game.hints), 0))
+        .filter(Game.user_id == current_user.id)
+        .scalar()
+    )
+
+    stats.total_points = int(total_points or 0)
+    stats.games_played = games_played
+    stats.accuracy = correct_games / games_played if games_played > 0 else 0
+    stats.avg_hints = float(avg_hints or 0)
 
     db.session.commit()
 

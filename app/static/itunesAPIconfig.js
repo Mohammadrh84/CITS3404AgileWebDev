@@ -187,12 +187,7 @@ async function isSongCorrect(Guess) {
     setTextIfElementExists('current-points', CurrentPoints);
 
     if (GameStatus) {
-        const scoreToSave = GuessStatus ? CurrentPoints : 0;
-        const savedStats = await saveScoreToDatabase(scoreToSave, GuessStatus);
-
-        await showResultsOverlay(GuessStatus, scoreToSave, savedStats);
-        await fetch('/api/reset');
-
+        await finishGame(GuessStatus, CurrentPoints);
         return GuessStatus;
     }
 
@@ -331,6 +326,20 @@ async function playSnippet() {
     setTimeout(() => {
         audio.pause();
     }, 2000);
+}
+
+
+async function finishGame(correct, currentPoints) {
+    const scoreToSave = correct ? currentPoints : 0;
+    const savedStats = await saveScoreToDatabase(scoreToSave, correct);
+
+    await showResultsOverlay(correct, scoreToSave, savedStats);
+    await fetch('/api/reset');
+}
+
+
+async function giveUpGame() {
+    await finishGame(false, 0);
 }
 
 
