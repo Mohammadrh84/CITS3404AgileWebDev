@@ -187,12 +187,7 @@ async function isSongCorrect(Guess) {
     setTextIfElementExists('current-points', CurrentPoints);
 
     if (GameStatus) {
-        setTextIfElementExists('your-score', CurrentPoints);
-        setTextIfElementExists('total-points', "test");
-
-        await showResultsOverlay(GuessStatus);
-        await fetch('/api/reset');
-
+        await finishGame(GuessStatus, CurrentPoints);
         return GuessStatus;
     }
 
@@ -334,7 +329,52 @@ async function playSnippet() {
 }
 
 
-async function showResultsOverlay(results) {
+async function finishGame(correct, currentPoints) {
+    const scoreToSave = correct ? currentPoints : 0;
+    const savedStats = await saveScoreToDatabase(scoreToSave, correct);
+
+    await showResultsOverlay(correct, scoreToSave, savedStats);
+    await fetch('/api/reset');
+}
+
+
+async function giveUpGame() {
+    await finishGame(false, 0);
+}
+
+
+async function saveScoreToDatabase(score, correct) {
+    try {
+        const response = await fetch('/api/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                score: score,
+                hints: currentHint,
+                guesses: currentGuess,
+                correct: correct
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.warn("Score was not saved:", data.error);
+            return null;
+        }
+
+        console.log("Score saved:", data);
+        return data;
+    } catch (error) {
+        console.error("Error saving score:", error);
+        return null;
+    }
+}
+
+
+async function showResultsOverlay(results, score, savedStats) {
     const overlay = document.getElementById('result-overlay');
     const overlayTitle = document.getElementById('overlay-title');
     const overlaySubTitle = document.getElementById('overlay-subtitle');
@@ -345,16 +385,20 @@ async function showResultsOverlay(results) {
     const { value } = await fetch('/api/song-details?argument=trackName').then(r => r.json());
 
     setTextIfElementExists('song-name-results', value || "Unknown song");
+    setTextIfElementExists('your-score', score);
+
+    if (savedStats && savedStats.total_points !== undefined) {
+        setTextIfElementExists('total-points', savedStats.total_points);
+    } else {
+        setTextIfElementExists('total-points', "Not saved");
+    }
 
     if (results) {
         overlayTitle.textContent = "You did it!";
-        overlaySubTitle.textContent = "Play again and see if you can get a streak going!";
+        overlaySubTitle.textContent = "Your score has been saved to the leaderboard.";
     } else {
-        setTextIfElementExists('your-score', 0);
-        setTextIfElementExists('total-points', "test");
-
-        overlayTitle.textContent = "Oops! Dont worry you cant win them all.";
-        overlaySubTitle.textContent = "Try again, you got the next one!";
+        overlayTitle.textContent = "Oops! Don't worry, you can't win them all.";
+        overlaySubTitle.textContent = "Your attempt has been saved. Try again!";
     }
 
     overlay.classList.remove('hidden');
