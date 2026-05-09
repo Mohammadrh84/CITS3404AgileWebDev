@@ -149,7 +149,7 @@ function renderSelectedArtists() {
 
   if (chosenArtists.length === 0) {
     selectedArtists.innerHTML = `
-      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-white/60">
+      <div class="rounded-full border border-white/10 bg-white/5 p-4 text-white/60">
         No artists selected yet.
       </div>
     `;
