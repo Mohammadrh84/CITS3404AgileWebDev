@@ -343,12 +343,24 @@ async function giveUpGame() {
 }
 
 
+function getCsrfToken() {
+    const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+
+    if (!csrfMetaTag) {
+        return "";
+    }
+
+    return csrfMetaTag.getAttribute("content");
+}
+
+
 async function saveScoreToDatabase(score, correct) {
     try {
         const response = await fetch('/api/save-score', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
             },
             body: JSON.stringify({
                 score: score,
