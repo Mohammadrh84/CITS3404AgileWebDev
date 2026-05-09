@@ -165,7 +165,7 @@ function renderSelectedArtists() {
     const chip = document.createElement("div");
 
     chip.className =
-      "flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3";
+      "group flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3 transition hover:border-[#ff4a6e] cursor-pointer";
 
     chip.innerHTML = `
       <img
@@ -174,13 +174,13 @@ function renderSelectedArtists() {
         class="w-10 h-10 rounded-full object-cover shrink-0 bg-black/20"
       >
 
-      <span class="max-w-[170px] truncate text-sm font-semibold text-white">
+      <span class="max-w-[170px] truncate text-sm font-semibold text-white group-hover:text-[#ff4a6e] transition">
         ${escapeHtml(artist.name)}
       </span>
 
       <button
         type="button"
-        class="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-sm font-bold text-white transition hover:text-neon-green"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-sm font-bold text-white group-hover:text-[#ff4a6e] transition"
         aria-label="Remove ${escapeHtml(artist.name)}"
       >
         ×

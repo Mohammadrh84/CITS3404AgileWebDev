@@ -26,7 +26,7 @@
 
             <nav class="flex flex-wrap items-center gap-3 text-sm font-semibold md:gap-6">
               <a href="{{ url_for('main.leaderboard') }}" class="text-neon-green">Leaderboard</a>
-              <a href="#" class="transition hover:text-neon-green">My Account</a>
+              <a href="{{ url_for('auth.logout') }}" class="text-white transition hover:text-neon-green">Logout</a>
               <a
                 href="{{ url_for('main.main_game') }}"
                 class="rounded-xl bg-neon-green px-4 py-2 text-black transition hover:scale-105"
