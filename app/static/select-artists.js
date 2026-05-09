@@ -165,7 +165,7 @@ function renderSelectedArtists() {
     const chip = document.createElement("div");
 
     chip.className =
-      "group flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3 transition hover:border-[#ff4a6e] cursor-pointer";
+      "group flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-2 py-2 pr-3 transition hover:border-[#ff4a6e] hover:bg-[#ff4a6e1f] cursor-pointer";
 
     chip.innerHTML = `
       <img
