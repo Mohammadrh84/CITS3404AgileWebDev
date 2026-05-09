@@ -6,8 +6,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ url_for('static', filename='tailwind-config.js') }}"></script>
 </head>
-<body class="bg-[url('https://i.pinimg.com/736x/04/87/40/048740932b7755d6086e54e7c8f31d06.jpg')] backdrop-blur-[100px] bg-cover bg-center bg-no-repeat">
-<div class="min-h-screen flex flex-col items-center">
+<body class="bg-background-black backdrop-blur-[100px] bg-cover bg-center bg-no-repeat">
+<div class="min-h-screen flex flex-col items-center"> // class="bg-background-black text-white min-h-screen"
     <h1 class="font-syne text-[35px] text-white mt-[125px]">
         <a href="{{ url_for('main.welcome') }}" class="text-white">spu</a><a href="{{ url_for('main.welcome') }}" class="text-neon-green">rdle</a>
     </h1>
