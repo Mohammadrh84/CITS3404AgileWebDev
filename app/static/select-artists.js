@@ -192,7 +192,7 @@ function renderSelectedArtists() {
 
     const removeButton = chip.querySelector("button");
 
-    removeButton.addEventListener("click", function () {
+    chip.addEventListener("click", function () {
       chosenArtists.splice(index, 1);
       renderSelectedArtists();
     });
