@@ -249,7 +249,7 @@ def select_artists():
             replace_saved_selected_artists_for_current_user(selected_artists)
 
             flash("Selected artists saved.", "success")
-            return redirect(url_for('main.select_artists'))
+            return redirect(url_for('main.main_game'))
 
     return render_template(
         'select_artists.html',
