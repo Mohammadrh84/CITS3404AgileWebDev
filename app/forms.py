@@ -32,7 +32,14 @@ class SignupForm(FlaskForm):
         'Password',
         validators=[
             DataRequired(),
-            Length(min=6)
+            Length(
+                min=8,
+                message='Password must be at least 8 characters.'
+            ),
+            Regexp(
+                r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).+$',
+                message='Password must include at least one letter, one number, and one special character.'
+            )
         ]
     )
 
@@ -40,7 +47,7 @@ class SignupForm(FlaskForm):
         'Confirm Password',
         validators=[
             DataRequired(),
-            EqualTo('password')
+            EqualTo('password', message='Passwords must match.')
         ]
     )
 
