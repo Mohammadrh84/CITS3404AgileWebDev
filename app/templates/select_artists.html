@@ -24,12 +24,7 @@
                 <nav class="flex flex-wrap items-center gap-3 text-sm font-semibold md:gap-6">
                     <a href="{{ url_for('main.leaderboard') }}" class="transition hover:text-neon-green">Leaderboard</a>
                     <a href="{{ url_for('auth.logout') }}" class="text-white transition hover:text-neon-green">Logout</a>
-                    <a
-                        href="{{ url_for('main.main_game') }}"
-                        class="rounded-xl bg-neon-green px-4 py-2 text-black transition hover:scale-105"
-                    >
-                        Play now
-                    </a>
+                    <a href="{{ url_for('main.select_artists') }}" class="rounded-xl pr-4 py-2 text-neon-green">Artist Select</a>
                 </nav>
             </div>
 
