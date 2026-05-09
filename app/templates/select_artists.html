@@ -50,6 +50,8 @@
                 class="mx-auto max-w-3xl"
                 data-max-artists="{{ max_selected_artists }}"
             >
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <input
                     id="selectedArtistsJson"
                     type="hidden"

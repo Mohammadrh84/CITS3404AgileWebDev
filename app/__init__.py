@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 
 from .models import db, User
 from .auth import auth
 from .routes import bp
+
+
+csrf = CSRFProtect()
 
 
 def create_app():
@@ -14,6 +18,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    csrf.init_app(app)
 
     # Register blueprint for main game routes
     app.register_blueprint(bp)
