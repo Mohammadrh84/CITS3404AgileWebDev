@@ -30,6 +30,10 @@ def main_game():
 def leaderboard():
     return render_template('leaderboard.html')
 
+@bp.route('/how-to-play')
+def how_to_play():
+    return render_template('how_to_play.html')
+
 
 def get_artist_image_from_itunes(artist_id):
     try:
