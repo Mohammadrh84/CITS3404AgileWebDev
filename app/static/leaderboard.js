@@ -1,5 +1,6 @@
 let players = [];
 let currentSort = "points";
+var Current_Username = null;
 
 function formatNumber(number) {
   return Number(number || 0).toLocaleString();
@@ -111,11 +112,11 @@ function updatePlayerDetail(playerList, playerDetail) {
     return;
   }
 
-  const topPlayer = playerList[0];
+  const topPlayer = playerList[0]; 
   const safeName = escapeHtml(getPlayerName(topPlayer));
 
   playerDetail.innerHTML = `
-    <p class="text-xs uppercase tracking-[0.25em] text-neon-green/80">Current top player</p>
+    <p class="text-xs uppercase tracking-[0.25em] text-neon-green/80">Your statistics</p>
     <h3 class="mt-3 text-2xl font-bold">${safeName}</h3>
     <p class="mt-2 text-white/70">
       ${formatNumber(topPlayer.points)} points · ${formatNumber(topPlayer.streak)} streak · ${topPlayer.accuracy}% accuracy
@@ -205,6 +206,10 @@ async function loadLeaderboard(elements) {
     if (!Array.isArray(players)) {
       players = [];
     }
+
+    const currentUserResponse = await fetch('/api/current-user');
+    const currentUserData = await currentUserResponse.json();
+    Current_Username = currentUserData.username;
 
     renderLeaderboard(elements);
   } catch (error) {

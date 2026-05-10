@@ -30,7 +30,7 @@ def main_game():
 def leaderboard():
     return render_template('leaderboard.html')
 
-@bp.route('/how-to-play')
+@bp.route('/how_to_play')
 def how_to_play():
     return render_template('how_to_play.html')
 
@@ -643,6 +643,16 @@ def leaderboard_data():
 
     return jsonify(leaderboard)
 
+@bp.route('/api/current-user')
+def current_user_info():
+    if current_user.is_authenticated:
+        return jsonify({
+            "username": current_user.username,
+            "points": current_user.stats.total_points if current_user.stats else 0,
+            "streak": calculate_current_streak(current_user.id),
+            "accuracy": round((current_user.stats.accuracy if current_user.stats else 0) * 100, 1)
+                        })
+    return jsonify({"username": None})
 
 @bp.route('/api/reset')
 @login_required
