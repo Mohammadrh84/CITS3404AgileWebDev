@@ -1,0 +1,55 @@
+import unittest
+from app import create_app
+from app.forms import SignupForm, LoginForm
+
+class TestForms(unittest.TestCase):
+
+    def setUp(self):
+        self.app = create_app()
+        self.app.config['WTF_CSRF_ENABLED'] = False
+    
+    def test_signup_form(self):
+        with self.app.test_request_context():
+            # ensure if requirements are met users can sign up
+            valid_form = SignupForm(
+                username="user",
+                password="testpassword67",
+                confirm="testpassword67"
+            )
+
+            self.assertTrue(valid_form.validate())
+
+            # testing violating validators (password too short)
+            bad_password_form = SignupForm(
+                username="user",
+                password="test",
+                confirm="test"
+            )
+
+            self.assertFalse(bad_password_form.validate())
+
+            # testing violating validators (no username)
+            empty_form = SignupForm(
+                username="",
+                password="test",
+                confirm="test"
+            )
+
+            self.assertFalse(empty_form.validate())
+
+    def test_login_form_valid(self):
+        with self.app.test_request_context():
+            # validates as long as fields are not empty
+            valid_form = LoginForm(
+                username="user",
+                password="testpassword67"
+            )
+
+            self.assertTrue(valid_form.validate())
+
+            empty_form = LoginForm(
+                username="user",
+                password=""
+            )
+
+            self.assertFalse(empty_form.validate())
