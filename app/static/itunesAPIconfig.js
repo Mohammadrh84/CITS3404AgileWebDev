@@ -114,6 +114,8 @@ async function getAlbumTrackCount(collectionID) {
 async function GetRandomSong() {
     const res = await fetch('/api/random-song?' + getArtistParams());
     const songDeets = await res.json();
+    const collectionID = songDeets.collectionID
+    const trackCount = await getAlbumTrackCount(collectionID);
 
     if (songDeets.error) {
         console.error(songDeets.error);
@@ -129,7 +131,11 @@ async function GetRandomSong() {
     ]);
 
     setImageIfElementExists('album-cover', artwork.value);
-    setAlbumNAmeHint(albumName.value);
+    if (trackCount < 2) {
+        setAlbumNAmeHint("This song is a sinlge");
+    } else {
+        setAlbumNAmeHint(albumName.value)
+    }
 
     if (releaseDate.value) {
         const formattedDate = new Date(releaseDate.value).toLocaleDateString('en-GB', {
