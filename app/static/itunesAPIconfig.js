@@ -131,7 +131,7 @@ async function GetRandomSong() {
     ]);
 
     setImageIfElementExists('album-cover', artwork.value);
-    if (trackCount < 2) {
+    if (trackCount == 1) {
         setAlbumNAmeHint("This song is a sinlge");
     } else {
         setAlbumNAmeHint(albumName.value)
