@@ -6,6 +6,7 @@ class TestForms(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app()
+        # disable CSRF for testing purposes
         self.app.config['WTF_CSRF_ENABLED'] = False
     
     def test_signup_form(self):
@@ -28,7 +29,7 @@ class TestForms(unittest.TestCase):
 
             self.assertFalse(bad_password_form.validate())
 
-            # testing violating validators (no username)
+            # testing violating validators (empty username)
             empty_form = SignupForm(
                 username="",
                 password="test",

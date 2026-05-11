@@ -72,7 +72,7 @@ class TestRoutes(unittest.TestCase):
         ])
 
         valid_result = parse_selected_artists(valid_selected_artists)
-
+        # ensure valid artist information is stored and retrieved properly
         self.assertEqual(len(valid_result), 2)
         self.assertEqual(valid_result[0]["id"], "1")
         self.assertEqual(valid_result[1]["id"], "2")
@@ -98,7 +98,7 @@ class TestRoutes(unittest.TestCase):
         }
 
         self.assertTrue(is_valid_song(valid_song, 123))
-        # make sure it rejects albums and incorrect wrapper types
+        # make sure it rejects albums and other incorrect wrapper types
         album = {
             "wrapperType": "album",
             "albumId": 123,

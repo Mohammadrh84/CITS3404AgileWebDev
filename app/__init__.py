@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
-
+from .config import Config, TestConfig
 from .models import db, User
 from .auth import auth
 from .routes import bp
@@ -10,13 +10,11 @@ from .routes import bp
 csrf = CSRFProtect()
 
 
-def create_app():
+def create_app(config_class=Config):
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = "dev-secret-key"
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///game.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
+    app.config.from_object(config_class)
+    
     db.init_app(app)
     csrf.init_app(app)
 
