@@ -95,6 +95,22 @@ function setAlbumNAmeHint(albumName) {
     setTextIfElementExists('album-name', albumName || "Unknown album")
 }
 
+async function getAlbumTrackCount(collectionID) {
+    if (!collectionID) {
+        return 0;
+    }
+
+    try {
+        const response = await fetch ('/api/album-track-count?collection_id=${collectionID}');
+        const data = await response.json();
+
+        return data.trackCount || 0;
+    } catch (error) {
+        console.error("Could not get album track count", error);
+        return 0;
+    }
+}
+
 async function GetRandomSong() {
     const res = await fetch('/api/random-song?' + getArtistParams());
     const songDeets = await res.json();
