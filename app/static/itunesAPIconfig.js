@@ -91,10 +91,31 @@ function setImageIfElementExists(elementId, imageUrl) {
     }
 }
 
+function setAlbumNameHint(albumName) {
+    setTextIfElementExists('album-name', albumName || "Unknown album");
+}
+
+async function getAlbumTrackCount(collectionID) {
+    if (!collectionID) {
+        return 0;
+    }
+
+    try {
+        const response = await fetch(`/api/album-track-count?collection_id=${collectionID}`);
+        const data = await response.json();
+
+        return data.trackCount || 0;
+    } catch (error) {
+        console.error("Could not get album track count", error);
+        return 0;
+    }
+}
 
 async function GetRandomSong() {
     const res = await fetch('/api/random-song?' + getArtistParams());
     const songDeets = await res.json();
+    const collectionID = songDeets.collectionId;
+    const trackCount = await getAlbumTrackCount(collectionID);
 
     if (songDeets.error) {
         console.error(songDeets.error);
@@ -110,7 +131,14 @@ async function GetRandomSong() {
     ]);
 
     setImageIfElementExists('album-cover', artwork.value);
-    setTextIfElementExists('album-name', albumName.value || "Unknown album");
+
+    const albumTitle = albumName.value || "Unknown album";
+
+    if (trackCount == 1 || albumTitle.toLowerCase().includes("single")) {
+        setAlbumNameHint("This song is a single");
+    } else {
+        setAlbumNameHint(albumTitle);
+    }
 
     if (releaseDate.value) {
         const formattedDate = new Date(releaseDate.value).toLocaleDateString('en-GB', {
