@@ -91,8 +91,19 @@ function setImageIfElementExists(elementId, imageUrl) {
     }
 }
 
-function setAlbumNameHint(albumName) {
-    setTextIfElementExists('album-name', albumName || "Unknown album");
+function setAlbumNameHint(albumName, isSingle = false) {
+    const element = document.getElementById('album-name');
+    if (!element) return;
+
+    element.textContent = albumName || "Unknown album";
+
+    if (isSingle) {
+        element.classList.add('text-[#ff4a6e]');
+        element.classList.remove('text-neon-green');
+    } else {
+        element.classList.add('text-neon-green');
+        element.classList.remove('text-[#ff4a6e]');
+    }
 }
 
 async function getAlbumTrackCount(collectionID) {
@@ -135,9 +146,9 @@ async function GetRandomSong() {
     const albumTitle = albumName.value || "Unknown album";
 
     if (trackCount == 1 || albumTitle.toLowerCase().includes("single")) {
-        setAlbumNameHint("This song is a single");
+        setAlbumNameHint("This song is a single", true);
     } else {
-        setAlbumNameHint(albumTitle);
+        setAlbumNameHint(albumTitle, false);
     }
 
     if (releaseDate.value) {
