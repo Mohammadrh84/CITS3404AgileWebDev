@@ -8,3 +8,10 @@ Spurdle is a music guessing game where you specify your favourite artists and ha
 | 24364632 | Dhruv Bharuth       | BotDurv         |
 | 24443565 | Mohammad Haddadpour | Mohammadrh84    |
 | 24197094 | Surtaj Singh        | taj-sketch      |
+
+## Running the Project Locally
+
+### Prerequisites
+- Python 3
+- Git
+- pip
