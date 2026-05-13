@@ -19,7 +19,7 @@ class TestAuthSelenium(unittest.TestCase):
             db.drop_all()
             db.create_all()
 
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Chrome()
         self.driver.get("http://127.0.0.1:5000")
 
     def test_signup(self):
