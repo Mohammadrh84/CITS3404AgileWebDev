@@ -1,6 +1,6 @@
 # Spurdle
 
-Spurdle is a music guessing game where you specify your favourite artists and have to guess a random song of theirs based on numerous hints. Guessing with less hints will reward the player with more points, with the highest scoring players being placed on a leaderboard tab so people can interact with others and view their scores.
+Spurdle is a music guessing game where users choose their favourite artists and try to guess a random song using a series of hints. Players receive more points for guessing with fewer hints, and high scores are shown on a leaderboard.
 
 ## Group Member Information
 
@@ -13,7 +13,11 @@ Spurdle is a music guessing game where you specify your favourite artists and ha
 
 ## Running the Project Locally
 
+Follow these steps to run Spurdle on your local machine.
+
 ### Prerequisites
+
+Make sure you have the following installed:
 
 - Python 3
 - Git
@@ -34,7 +38,7 @@ Create a virtual environment:
 python -m venv .venv
 ```
 
-Activate it on Windows PowerShell:
+Activate the virtual environment on Windows PowerShell:
 
 ```bash
 .\.venv\Scripts\Activate.ps1
@@ -46,9 +50,16 @@ If PowerShell blocks activation, run:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 .\.venv\Scripts\Activate.ps1
 ```
+
+For macOS/Linux, activate the virtual environment with:
+
+```bash
+source .venv/bin/activate
+```
+
 ### 3. Install Requirements
 
-After activating the virtual environment, install the required Python packages:
+Install the required Python packages:
 
 ```bash
 pip install -r requirements.txt
@@ -65,7 +76,7 @@ SPURDLE_SECRET_KEY=dev-secret-key
 SPURDLE_DATABASE_URL=sqlite:///game.db
 ```
 
-The `.env` file is used to store local configuration values such as the Flask secret key and database URL.
+These values are used by the Flask app for local configuration.
 
 ### 5. Set Up the Database
 
@@ -76,6 +87,8 @@ flask --app app db upgrade
 ```
 
 This creates or updates the local database tables needed by the project.
+
+For normal setup, this is the only database migration command needed.
 
 ### 6. Run the Flask App
 
@@ -90,3 +103,4 @@ Then open the local address shown in the terminal, usually:
 ```text
 http://127.0.0.1:5000
 ```
+
