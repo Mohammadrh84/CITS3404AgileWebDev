@@ -1,7 +1,9 @@
 # Spurdle
+
 Spurdle is a music guessing game where you specify your favourite artists and have to guess a random song of theirs based on numerous hints. Guessing with less hints will reward the player with more points, with the highest scoring players being placed on a leaderboard tab so people can interact with others and view their scores.
 
 ## Group Member Information
+
 | UWA ID   | Name                | GitHub Username |
 | -------- | ------------------- | --------------- |
 | 24271659 | Nathan Flack        | nathanjstack    |
@@ -12,6 +14,7 @@ Spurdle is a music guessing game where you specify your favourite artists and ha
 ## Running the Project Locally
 
 ### Prerequisites
+
 - Python 3
 - Git
 - pip
@@ -21,3 +24,25 @@ Spurdle is a music guessing game where you specify your favourite artists and ha
 ```bash
 git clone https://github.com/Mohammadrh84/Spurdle.git
 cd Spurdle
+```
+
+### 2. Create and Activate a Virtual Environment
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate it on Windows PowerShell:
+
+```bash
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation, run:
+
+```bash
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
+.\.venv\Scripts\Activate.ps1
+```
