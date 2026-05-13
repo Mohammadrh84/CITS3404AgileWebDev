@@ -15,3 +15,9 @@ Spurdle is a music guessing game where you specify your favourite artists and ha
 - Python 3
 - Git
 - pip
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Mohammadrh84/Spurdle.git
+cd Spurdle
