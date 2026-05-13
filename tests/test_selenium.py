@@ -12,7 +12,7 @@ from werkzeug.security import generate_password_hash
 class TestAuthSelenium(unittest.TestCase):
 
     def setUp(self):
-        # Create test database so users are not stored in the main game database.
+        # Create test database so users are not stored in the main game database
         self.app = create_app(TestConfig)
 
         with self.app.app_context():
@@ -40,7 +40,7 @@ class TestAuthSelenium(unittest.TestCase):
         self.assertIn("sign_in", driver.current_url)
 
     def signin(self, username, password):
-        # Add specified user information to the database to allow login.
+        # Add specified user information to the database so signin is possible
         with self.app.app_context():
             user = User(
                 username=username,
