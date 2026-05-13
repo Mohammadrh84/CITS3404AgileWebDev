@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from app.config import TestConfig
-from app.models import db, User
+from app.models import db, User, Stats
 from app import create_app
 from werkzeug.security import generate_password_hash
 
@@ -63,17 +63,8 @@ class TestAuthSelenium(unittest.TestCase):
             EC.url_contains("select_artists")
         )
 
-    def test_signin(self):
+    def select_artist_drake(self):
         driver = self.driver
-
-        self.signin("john532", "password67#")
-        # after signing in the user should be taken to the select artists page
-        self.assertIn("select_artists", driver.current_url)
-
-    def test_select_artist(self):
-        driver = self.driver
-
-        self.signin("john532", "password67#")
 
         # wait to make sure artist search is visible
         search_box = WebDriverWait(driver, 5).until(
@@ -81,11 +72,11 @@ class TestAuthSelenium(unittest.TestCase):
         )
 
         search_box.send_keys("Drake")
-        # wait for api to respond to search (may take time)
-        artist_button = WebDriverWait(driver, 5).until(
+        # wait for api to respond to search 
+        artist_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((
                 By.XPATH,
-                "//button[.//p[text()='Drake']]"
+                f"//button[.//p[text()='Drake']]"
             ))
         )
         
@@ -102,7 +93,83 @@ class TestAuthSelenium(unittest.TestCase):
             EC.url_contains("main_game")
         )
 
+    def test_signin(self):
+        driver = self.driver
+        self.signin("john532", "password67#")
+        # after signing in the user should be taken to the select artists page
+        self.assertIn("select_artists", driver.current_url)
+
+    def test_select_artist(self):
+        driver = self.driver
+
+        self.signin("john532", "password67#")
+
+        self.select_artist_drake()
+
         self.assertIn("main_game", driver.current_url)
+    
+    def test_main_game(self):
+        driver = self.driver
+
+        self.signin("john532", "password67#")
+
+        self.select_artist_drake()
+
+        # test that all hints are properly revealed
+        reveal_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Reveal Hint')]"))
+        )
+        for _ in range(5):
+            reveal_button.click() 
+
+        # test that users can give up
+        give_up = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Give up?')]"))
+        )
+        give_up.click()
+
+        # ensure results are shown after user gives up
+        WebDriverWait(driver, 5).until(
+            EC.visibility_of_element_located((By.ID, "result-overlay"))
+        )
+        self.assertTrue(driver.find_element(By.ID, "result-overlay").is_displayed())
+
+    def test_leaderboard(self):
+        driver = self.driver
+        self.signin("sampleuser", "password67#")
+
+        # edit the stats of the user just created through the login helper function
+        with self.app.app_context():
+            user = User.query.filter_by(username="sampleuser").first()
+            stats = Stats(
+                user_id=user.id,
+                total_points=250,
+                accuracy=0.75,
+                games_played=4,
+                avg_hints=2.5,
+                current_streak=3,
+                best_streak=5
+            )
+            db.session.add(stats)
+            db.session.commit()
+
+        driver.get("http://127.0.0.1:5000/leaderboard")
+
+        # check to make sure user appearsa on leaderboard
+        WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'sampleuser')]"))
+        )
+
+        page_source = driver.page_source
+        self.assertIn("sampleuser", page_source)
+        # check if key stats are showing up on the leaderboard with the user:
+        # points
+        self.assertIn("250", page_source)
+        # accuracy
+        self.assertIn("75%", page_source)
+        # games played
+        self.assertIn("4", page_source)
+
 
     def tearDown(self):
         self.driver.quit()
