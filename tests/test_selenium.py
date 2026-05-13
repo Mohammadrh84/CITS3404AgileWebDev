@@ -27,8 +27,6 @@ class TestAuthSelenium(unittest.TestCase):
 
         driver.get("http://127.0.0.1:5000/sign_up")
 
-        # Signup data must satisfy SignupForm validators:
-        # username 5-20 characters, password with letter, number, and special character.
         driver.find_element(By.NAME, "username").send_keys("testuser")
         driver.find_element(By.NAME, "password").send_keys("testuserpw67#")
         driver.find_element(By.NAME, "confirm").send_keys("testuserpw67#")
@@ -77,37 +75,34 @@ class TestAuthSelenium(unittest.TestCase):
 
         self.signin("john532", "password67#")
 
-        # wait for search box
+        # wait to make sure artist search is visible
         search_box = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.ID, "artistSearch"))
         )
 
         search_box.send_keys("Drake")
-        # wait for the artist result button (based on text "Drake")
+        # wait for api to respond to search (may take time)
         artist_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((
                 By.XPATH,
                 "//button[.//p[text()='Drake']]"
             ))
         )
-        # click the artist
+        
         artist_button.click()
 
-        # Now click the save/start button
         save_button = WebDriverWait(driver, 5).until(
             EC.element_to_be_clickable((By.ID, "saveArtistsButton"))
         )
+        # click the save / start game button
         save_button.click()
     
-        # assert we moved to game page
+        # ensure we moved over to the main game
         WebDriverWait(driver, 5).until(
             EC.url_contains("main_game")
         )
 
         self.assertIn("main_game", driver.current_url)
-
-        # This confirms the select artists page loads after login.
-        self.assertIn("select_artists", driver.current_url)
 
     def tearDown(self):
         self.driver.quit()
