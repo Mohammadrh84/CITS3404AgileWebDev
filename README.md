@@ -76,3 +76,17 @@ flask --app app db upgrade
 ```
 
 This creates or updates the local database tables needed by the project.
+
+### 6. Run the Flask App
+
+Start the Flask development server:
+
+```bash
+flask --app app run
+```
+
+Then open the local address shown in the terminal, usually:
+
+```text
+http://127.0.0.1:5000
+```
