@@ -53,3 +53,16 @@ After activating the virtual environment, install the required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
+
+### 4. Create a `.env` File
+
+Create a file called `.env` in the project root.
+
+Example `.env` file:
+
+```env
+SPURDLE_SECRET_KEY=dev-secret-key
+SPURDLE_DATABASE_URL=sqlite:///game.db
+```
+
+The `.env` file is used to store local configuration values such as the Flask secret key and database URL.
