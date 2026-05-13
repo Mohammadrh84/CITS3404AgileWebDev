@@ -46,3 +46,10 @@ If PowerShell blocks activation, run:
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned
 .\.venv\Scripts\Activate.ps1
 ```
+### 3. Install Requirements
+
+After activating the virtual environment, install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
