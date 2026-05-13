@@ -30,6 +30,10 @@ def main_game():
 def leaderboard():
     return render_template('leaderboard.html')
 
+@bp.route('/how_to_play')
+def how_to_play():
+    return render_template('how_to_play.html')
+
 
 def get_artist_image_from_itunes(artist_id):
     try:
@@ -255,7 +259,7 @@ def select_artists():
             replace_saved_selected_artists_for_current_user(selected_artists)
 
             flash("Selected artists saved.", "success")
-            return redirect(url_for('main.select_artists'))
+            return redirect(url_for('main.main_game'))
 
     return render_template(
         'select_artists.html',
@@ -313,6 +317,7 @@ def random_song():
     session['letters_wrong'] = []
     session['current_points'] = 100
     session['num_guesses'] = 0
+    session['game_registered'] = False 
 
     artist_name = request.args.get('artist')
     artist_id = request.args.get('artist_id')
@@ -348,7 +353,7 @@ def random_song():
         return jsonify({"error": "No songs found for this artist."}), 404
 
     session['random_song_details'] = random.choice(songs)
-
+    session['points_disabled'] = len(songs) < 10
     return jsonify(session['random_song_details'])
 
 
@@ -360,6 +365,36 @@ def song_details():
         "value": session.get('random_song_details', {}).get(argument)
     })
 
+@bp.route('/api/album-track-count')
+@login_required
+def album_track_count():
+    collection_id = request.args.get('collection_id')
+
+    if not collection_id:
+        return jsonify({"tracCount"})
+    
+    try:
+        response = requests.get(
+            "https://itunes.apple.com/lookup",
+            params={
+                "id": collection_id,
+                "entity": "song"
+            },
+            timeout=10
+        )
+
+        results = response.json().get("results", [])
+    
+    except (requests.RequestException, ValueError):
+        return jsonify({"trackCount": 0})
+    
+    track_count = 0
+
+    for item in results:
+        if item.get("wrapperType") == "track":
+            track_count += 1
+    
+    return jsonify({"trackCount": track_count})
 
 @bp.route('/api/artist-image')
 def artist_image():
@@ -466,6 +501,13 @@ def calculate_points():
     type_of_points = int(request.args.get('type'))
     current_hint = int(request.args.get('current-hint'))
 
+    if session.get('points_disabled'):
+        return jsonify({
+            "CurrentPoints": 0,
+            "GuessStatus": user_guess == song_name and user_guess != "" and song_name != "",
+            "GameStatus": user_guess == song_name and user_guess != "" and song_name != ""
+        })
+
     if type_of_points == 0:
         current_points -= 3
     elif type_of_points == 1:
@@ -534,6 +576,9 @@ def calculate_current_streak(user_id):
 @bp.route('/api/save-score', methods=['POST'])
 @login_required
 def save_score():
+    if session.get('points_disabled'):
+        return jsonify({"message": "Small artist. Score not affected."}), 200
+
     data = request.get_json() or {}
 
     client_score = safe_int(data.get('score'), 0)
@@ -576,15 +621,13 @@ def save_score():
             total_points=0,
             accuracy=0,
             games_played=0,
-            avg_hints=0
+            avg_hints=0,
+            current_streak=0,
+            best_streak=0
         )
         db.session.add(stats)
 
-    games_played = (
-        Game.query
-        .filter_by(user_id=current_user.id)
-        .count()
-    )
+    games_played = stats.games_played
 
     correct_games = (
         Game.query
@@ -604,10 +647,16 @@ def save_score():
         .scalar()
     )
 
+    current_streak = calculate_current_streak(current_user.id)
+
     stats.total_points = int(total_points or 0)
-    stats.games_played = games_played
-    stats.accuracy = correct_games / games_played if games_played > 0 else 0
+    #stats.games_played = games_played
+    stats.accuracy = correct_games / stats.games_played if stats.games_played > 0 else 0
     stats.avg_hints = float(avg_hints or 0)
+    stats.current_streak = current_streak
+
+    if current_streak > (stats.best_streak or 0):
+        stats.best_streak = current_streak
 
     db.session.commit()
 
@@ -618,7 +667,8 @@ def save_score():
         "games_played": stats.games_played,
         "accuracy": round(stats.accuracy * 100, 1),
         "avg_hints": round(stats.avg_hints, 1),
-        "streak": calculate_current_streak(current_user.id)
+        "streak": stats.current_streak,
+        "best_streak": stats.best_streak
     })
 
 
@@ -637,14 +687,13 @@ def leaderboard_data():
         leaderboard.append({
             "name": user.username,
             "points": stats.total_points or 0,
-            "streak": calculate_current_streak(user.id),
+            "streak": stats.current_streak or 0,
             "accuracy": round((stats.accuracy or 0) * 100, 1),
             "games": stats.games_played or 0,
             "avgHints": round(stats.avg_hints or 0, 1)
         })
 
     return jsonify(leaderboard)
-
 
 @bp.route('/api/reset')
 @login_required
@@ -653,7 +702,36 @@ def reset_game():
     session['num_guesses'] = 0
     session['letters_correct'] = []
     session['letters_wrong'] = []
+    session['game_registered'] = False
+    session['points_disabled'] = False
 
     return jsonify({
         "message": "Game reset successfully"
     })
+
+@bp.route('/api/register-game', methods=['POST'])
+@login_required
+def register_game():
+    if session.get('points_disabled'):
+        return jsonify({"message": "Small artist. Score not affected."}), 200
+    
+    if session.get('game_registered'):
+        return jsonify({"message": "Already registered."}), 200
+
+    session['game_registered'] = True
+
+    stats = Stats.query.filter_by(user_id=current_user.id).first()
+    if stats is None:
+        stats = Stats(user_id=current_user.id, total_points=0, accuracy=0, games_played=0, avg_hints=0)
+        db.session.add(stats)
+
+    stats.games_played += 1
+    db.session.commit()
+
+    return jsonify({"message": "Game registered."})
+
+@bp.route('/api/current-user')
+def current_user_info():
+    if current_user.is_authenticated:
+        return jsonify({"username": current_user.username})
+    return jsonify({"username": None})

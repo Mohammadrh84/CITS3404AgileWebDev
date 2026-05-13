@@ -1,22 +1,26 @@
 from flask import Flask
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
-from .config import Config, TestConfig
+from flask_migrate import Migrate
+
+from .config import Config
 from .models import db, User
 from .auth import auth
 from .routes import bp
 
 
 csrf = CSRFProtect()
+migrate = Migrate()
 
 
 def create_app(config_class=Config):
     app = Flask(__name__)
 
     app.config.from_object(config_class)
-    
+
     db.init_app(app)
     csrf.init_app(app)
+    migrate.init_app(app, db)
 
     # Register blueprint for main game routes
     app.register_blueprint(bp)
@@ -24,12 +28,7 @@ def create_app(config_class=Config):
     # Register blueprint for login and signup routes
     app.register_blueprint(auth)
 
-    with app.app_context():
-        db.create_all()
-
     login_manager = LoginManager(app)
-
-    # This must match the real auth route function name in auth.py
     login_manager.login_view = "auth.sign_in"
 
     @login_manager.user_loader
