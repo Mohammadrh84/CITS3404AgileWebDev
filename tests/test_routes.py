@@ -203,40 +203,50 @@ class TestRoutes(unittest.TestCase):
 
         self.assertEqual(len(result), MAX_SELECTED_ARTISTS)
 
-    def test_valid_song(self):
-        valid_song = {
+    def test_is_valid_song_accepts_valid_song(self):
+        song = {
             "wrapperType": "track",
             "artistId": 123,
             "trackName": "Normal Song"
         }
 
-        self.assertTrue(is_valid_song(valid_song, 123))
-        # make sure it rejects albums and other incorrect wrapper types
-        album = {
+        self.assertTrue(is_valid_song(song, 123))
+
+    def test_is_valid_song_rejects_album(self):
+        song = {
             "wrapperType": "album",
             "albumId": 123,
             "albumName": "Random Album"
         }
 
-        self.assertFalse(is_valid_song(album, 123))
+        self.assertFalse(is_valid_song(song, 123))
 
-        # ensure that the expected id always lines up
-        incorrect_id = {
+    def test_is_valid_song_rejects_wrong_artist_id(self):
+        song = {
             "wrapperType": "track",
             "artistId": 124,
             "trackName": "Bad Song"
         }
 
-        self.assertFalse(is_valid_song(incorrect_id, 123))
+        self.assertFalse(is_valid_song(song, 123))
 
-        # ensure remixes are excluded
-        remix_song = {
+    def test_is_valid_song_rejects_remix_case_insensitive(self):
+        song = {
             "wrapperType": "track",
             "artistId": 123,
-            "trackName": "Normal Song (Remix)"
+            "trackName": "Normal Song REMIX"
         }
 
-        self.assertFalse(is_valid_song(remix_song, 123))
+        self.assertFalse(is_valid_song(song, 123))
+
+    def test_is_valid_song_accepts_artist_id_as_string_or_int(self):
+        song = {
+            "wrapperType": "track",
+            "artistId": "123",
+            "trackName": "Normal Song"
+        }
+
+        self.assertTrue(is_valid_song(song, 123))
 
 
 if __name__ == "__main__":
