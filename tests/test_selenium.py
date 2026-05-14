@@ -19,7 +19,7 @@ class TestAuthSelenium(unittest.TestCase):
             db.drop_all()
             db.create_all()
 
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Firefox()
         self.driver.get("http://127.0.0.1:5000")
 
     def test_signup(self):
@@ -38,6 +38,23 @@ class TestAuthSelenium(unittest.TestCase):
         )
 
         self.assertIn("sign_in", driver.current_url)
+
+    def test_invalid_signup_stays_on_signup_page(self):
+        driver = self.driver
+
+        driver.get("http://127.0.0.1:5000/sign_up")
+
+        driver.find_element(By.NAME, "username").send_keys("bad")
+        driver.find_element(By.NAME, "password").send_keys("weak")
+        driver.find_element(By.NAME, "confirm").send_keys("weak")
+
+        driver.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+
+        WebDriverWait(driver, 5).until(
+            EC.url_contains("sign_up")
+        )
+
+        self.assertIn("sign_up", driver.current_url)
 
     def signin(self, username, password):
         # Add specified user information to the database so signin is possible
@@ -72,14 +89,14 @@ class TestAuthSelenium(unittest.TestCase):
         )
 
         search_box.send_keys("Drake")
-        # wait for api to respond to search 
+        # wait for api to respond to search
         artist_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((
                 By.XPATH,
-                f"//button[.//p[text()='Drake']]"
+                "//button[.//p[text()='Drake']]"
             ))
         )
-        
+
         artist_button.click()
 
         save_button = WebDriverWait(driver, 5).until(
@@ -87,7 +104,7 @@ class TestAuthSelenium(unittest.TestCase):
         )
         # click the save / start game button
         save_button.click()
-    
+
         # ensure we moved over to the main game
         WebDriverWait(driver, 5).until(
             EC.url_contains("main_game")
@@ -107,7 +124,7 @@ class TestAuthSelenium(unittest.TestCase):
         self.select_artist_drake()
 
         self.assertIn("main_game", driver.current_url)
-    
+
     def test_main_game(self):
         driver = self.driver
 
@@ -120,7 +137,7 @@ class TestAuthSelenium(unittest.TestCase):
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Reveal Hint')]"))
         )
         for _ in range(5):
-            reveal_button.click() 
+            reveal_button.click()
 
         # test that users can give up
         give_up = WebDriverWait(driver, 5).until(
@@ -155,7 +172,7 @@ class TestAuthSelenium(unittest.TestCase):
 
         driver.get("http://127.0.0.1:5000/leaderboard")
 
-        # check to make sure user appearsa on leaderboard
+        # check to make sure user appears on leaderboard
         WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'sampleuser')]"))
         )
@@ -169,7 +186,6 @@ class TestAuthSelenium(unittest.TestCase):
         self.assertIn("75%", page_source)
         # games played
         self.assertIn("4", page_source)
-
 
     def tearDown(self):
         self.driver.quit()
