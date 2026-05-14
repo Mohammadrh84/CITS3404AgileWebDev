@@ -1,5 +1,12 @@
 import unittest
-from app.routes import filter_song_name, get_itunes_artist_id, clean_selected_artist, parse_selected_artists, is_valid_song
+from app.routes import (
+    FALLBACK_ARTIST_IMAGE,
+    filter_song_name,
+    get_itunes_artist_id,
+    clean_selected_artist,
+    parse_selected_artists,
+    is_valid_song,
+)
 import json
 from unittest.mock import patch
 
@@ -76,28 +83,63 @@ class TestRoutes(unittest.TestCase):
         self.assertIsNone(result)
         mock_get.assert_not_called()
 
-    def test_clean_selected_artist(self):
-        # test for cases where artist information may have whitespace
+    def test_clean_selected_artist_removes_whitespace(self):
         artist = {
-            "id": " 123",
+            "id": " 123 ",
             "name": " Test Artist ",
-            "image": "img.jpg"
+            "image": " img.jpg "
         }
 
-        cleaned_artist = {
+        expected_artist = {
             "id": "123",
             "name": "Test Artist",
             "image": "img.jpg"
         }
 
         result = clean_selected_artist(artist)
-        self.assertEqual(cleaned_artist, result)
 
-        # test again for cases where the artist information is empty and ensure None is returned
-        empty_artist = {}
+        self.assertEqual(expected_artist, result)
 
-        empty_result = clean_selected_artist(empty_artist)
-        self.assertIsNone(empty_result)
+    def test_clean_selected_artist_returns_none_for_empty_artist(self):
+        result = clean_selected_artist({})
+
+        self.assertIsNone(result)
+
+    def test_clean_selected_artist_returns_none_for_non_dict(self):
+        result = clean_selected_artist("not an artist dictionary")
+
+        self.assertIsNone(result)
+
+    def test_clean_selected_artist_returns_none_for_missing_id(self):
+        artist = {
+            "name": "Test Artist",
+            "image": "img.jpg"
+        }
+
+        result = clean_selected_artist(artist)
+
+        self.assertIsNone(result)
+
+    def test_clean_selected_artist_returns_none_for_missing_name(self):
+        artist = {
+            "id": "123",
+            "image": "img.jpg"
+        }
+
+        result = clean_selected_artist(artist)
+
+        self.assertIsNone(result)
+
+    def test_clean_selected_artist_uses_fallback_image_when_image_is_empty(self):
+        artist = {
+            "id": "123",
+            "name": "Test Artist",
+            "image": ""
+        }
+
+        result = clean_selected_artist(artist)
+
+        self.assertEqual(result["image"], FALLBACK_ARTIST_IMAGE)
 
     def test_parse_selected_artists(self):
         valid_selected_artists = json.dumps([
