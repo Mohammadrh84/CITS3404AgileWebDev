@@ -53,6 +53,10 @@ function getFallbackImage() {
   return FALLBACK_ARTIST_IMAGE;
 }
 
+/*
+Stops the current search request and clears the search timer.
+This helps stop old search results from showing after the user keeps typing.
+*/
 function stopActiveSearch() {
   latestSearchId++;
 
@@ -67,10 +71,16 @@ function stopActiveSearch() {
   }
 }
 
+/*
+Shows the search results dropdown.
+*/
 function showSearchResults() {
   searchResultsWrap.classList.remove("hidden");
 }
 
+/*
+Hides the search results dropdown and clears the results.
+*/
 function hideSearchResults() {
   stopActiveSearch();
   searchResultsWrap.classList.add("hidden");
@@ -306,6 +316,10 @@ function addArtist(artist) {
   return true;
 }
 
+/*
+Shows a message inside the search dropdown.
+This is used for searching, no results, errors, and max artist limit messages.
+*/
 function renderSearchMessage(message, isError = false) {
   searchResults.innerHTML = `
     <li class="px-4 py-3 text-sm ${isError ? "text-red-400" : "text-white/60"} border-b border-white/5 last:border-0">
@@ -316,6 +330,11 @@ function renderSearchMessage(message, isError = false) {
   showSearchResults();
 }
 
+/*
+Renders the list of artists returned by the backend search route.
+It also shows whether each artist can be added, is already selected, or cannot be added
+because the max artist limit has been reached.
+*/
 function renderSearchResults(results, searchId, query) {
   if (searchId !== latestSearchId) {
     return;
@@ -384,6 +403,10 @@ function renderSearchResults(results, searchId, query) {
     const resultImage = item.querySelector("img");
     handleBrokenArtistImage(resultImage);
 
+    /*
+    Loads a better image for each artist result after the result is shown.
+    This keeps the search list fast while still improving the image when possible.
+    */
     fetch(`/api/artist-image-by-id?artist_id=${encodeURIComponent(artist.id)}`)
       .then((response) => response.json())
       .then((data) => {
@@ -414,6 +437,11 @@ function renderSearchResults(results, searchId, query) {
   showSearchResults();
 }
 
+/*
+Searches for artists using the backend artist search API.
+The search is cancelled and restarted when the user keeps typing,
+so old results do not appear after a newer search.
+*/
 async function searchArtistsFromAPI(query) {
   query = query.trim();
 
@@ -470,6 +498,10 @@ async function searchArtistsFromAPI(query) {
   }
 }
 
+/*
+Waits briefly after the user types before searching.
+This avoids sending a search request for every single key press.
+*/
 artistSearch.addEventListener("input", function (event) {
   const query = event.target.value;
 
@@ -482,12 +514,19 @@ artistSearch.addEventListener("input", function (event) {
   }, 150);
 });
 
+/*
+Closes the search dropdown when the user clicks outside the search input or results box.
+*/
 document.addEventListener("mousedown", function (event) {
   if (!artistSearch.contains(event.target) && !searchResultsWrap.contains(event.target)) {
     hideSearchResults();
   }
 });
 
+/*
+Checks the form before saving selected artists.
+The clear button skips validation because the user is allowed to clear all artists.
+*/
 selectArtistsForm.addEventListener("submit", function (event) {
   const clickedButton = event.submitter || document.activeElement;
 
@@ -504,6 +543,9 @@ selectArtistsForm.addEventListener("submit", function (event) {
   }
 });
 
+/*
+Hides temporary status messages after a short delay.
+*/
 setTimeout(function () {
   const messages = document.querySelectorAll(".status-message");
 
@@ -512,6 +554,10 @@ setTimeout(function () {
   });
 }, 2500);
 
+/*
+Initial page setup.
+Loads saved artists, displays them, and updates the buttons/messages.
+*/
 loadInitialSelectedArtists();
 renderSelectedArtists();
 updateSaveButton();
