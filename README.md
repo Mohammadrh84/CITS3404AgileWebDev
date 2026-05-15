@@ -104,3 +104,7 @@ Then open the local address shown in the terminal, usually:
 http://127.0.0.1:5000
 ```
 
+# Running Tests
+1. Ensure Google Chrome is installed (as this is the browser the tests will run on)
+2. First make sure the test live server is running by entering `python test_run.py` into the terminal (this uses the test server which uses a test database rather than the main game database)
+3. In a separate terminal window, while the test server is running, run the tests with python -m unittest discover tests

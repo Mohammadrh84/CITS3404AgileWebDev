@@ -9,3 +9,12 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("SPURDLE_DATABASE_URL")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class TestConfig:
+    TESTING = True
+    SECRET_KEY = "test-secret-key"
+
+    SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    WTF_CSRF_ENABLED = False
