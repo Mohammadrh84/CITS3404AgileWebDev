@@ -7,6 +7,12 @@ let snippetStartTime = 0;
 
 let cacheArtistImage = null;
 
+let cachedReleaseDate = null;
+let cachedAlbumCover = null;
+let cachedAlbumName = null;
+let cachedIsSingle = false;
+let cachedPreviewUrl = null;
+
 const FALLBACK_ARTIST = {
     id: "159260351",
     name: "Taylor Swift",
@@ -15,7 +21,9 @@ const FALLBACK_ARTIST = {
 
 const FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 
-// On page load, resets server session, loads the user's artists, picks one at random, then starts the game
+/*
+On page load, resets server session, loads the user's artists, picks one at random, then starts the game
+*/
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         await fetch('/api/reset');
@@ -145,75 +153,47 @@ async function GetRandomSong() {
     gameRegistered = false;
     const res = await fetch('/api/random-song?' + getArtistParams());
     const songDeets = await res.json();
-    const collectionID = songDeets.collectionId;
-    const trackCount = await getAlbumTrackCount(collectionID);
 
     if (songDeets.error) {
         console.error(songDeets.error);
         return;
     }
 
-    setTextIfElementExists('artist-name', cacheArtistName);
+    cachedPreviewUrl = songDeets.previewUrl || null;
+    cachedAlbumCover = songDeets.artworkUrl100 || null;
+    cachedAlbumName = songDeets.collectionName || "Unknown album";
+    cachedIsSingle = songDeets.trackCount === 1 || cachedAlbumName.toLowerCase().includes("single");
 
-    const [artwork, albumName, releaseDate] = await Promise.all([
-        fetch('/api/song-details?argument=artworkUrl100').then(r => r.json()),
-        fetch('/api/song-details?argument=collectionName').then(r => r.json()),
-        fetch('/api/song-details?argument=releaseDate').then(r => r.json())
-    ]);
-
-    setImageIfElementExists('album-cover', artwork.value);
-
-    const albumTitle = albumName.value || "Unknown album";
-
-    if (trackCount == 1 || albumTitle.toLowerCase().includes("single")) {
-        setAlbumNameHint("This song is a single", true);
+    if (songDeets.releaseDate) {
+        cachedReleaseDate = new Date(songDeets.releaseDate).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
     } else {
-        setAlbumNameHint(albumTitle, false);
+        cachedReleaseDate = "Unknown release date";
     }
 
-    if (releaseDate.value) {
-        const formattedDate = new Date(releaseDate.value).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
+    setTextIfElementExists('artist-name', cacheArtistName);
+    listOfSongNames = songDeets.songNames || [];
 
-        setTextIfElementExists('release-date', formattedDate);
-    } else {
-        setTextIfElementExists('release-date', "Unknown release date");
+    if (songDeets.pointsDisabled) {
+        const container = document.getElementById('small-artist-warning');
+        const p = document.createElement('p');
+        p.textContent = "This artist has less than 10 songs. To maintain fairness, songs from this artist will not award points!";
+        p.className = "mt-1 text-sm rounded-full py-2 px-4 text-[#ff4a6e] border border-[#ff4a6e]/50 bg-[#ff4a6e1f]";
+        container.appendChild(p);
     }
 
     if (!cacheArtistImage || cacheArtistImage === FALLBACK_ARTIST_IMAGE) {
         try {
             const imgRes = await fetch('/api/artist-image?artist=' + encodeURIComponent(cacheArtistName));
             const imgData = await imgRes.json();
-
-            if (imgData.image) {
-                cacheArtistImage = imgData.image;
-            }
+            if (imgData.image) cacheArtistImage = imgData.image;
         } catch (error) {
             console.error("Could not load artist image:", error);
         }
     }
 
     setImageIfElementExists('artist-image', cacheArtistImage);
-
-    const songsRes = await fetch('/api/songs?' + getArtistParams());
-    const songsData = await songsRes.json();
-
-    if (Array.isArray(songsData)) {
-        listOfSongNames = songsData;
-    } else {
-        listOfSongNames = [];
-    }
-
-    if (listOfSongNames.length < 10) {
-    const container = document.getElementById('small-artist-warning');
-    const p = document.createElement('p');
-    p.textContent = "This artist has less than 10 songs. To maintain fairness, songs from this artists will not award points!";
-    p.className = "mt-1 text-sm rounded-full py-2 px-4 text-[#ff4a6e] border border-[#ff4a6e]/50 bg-[#ff4a6e1f]";
-    container.appendChild(p);
-}
 }
 
 /*
@@ -323,10 +303,18 @@ let currentHint = 0;
 Reveals the next hint section and deducts points on the server. Hint 3 specifically also triggers the letter colouring.
 */
 async function NextHint() {
-    if (currentHint >= 5) {
-        return;
-    }
+    if (currentHint >= 5) return;
+
     await registerGame();
+
+    const params = new URLSearchParams({
+        'user-guess': "",
+        'song-name': "",
+        'type': 1,
+        'current-hint': currentHint + 1
+    });
+
+    const { CurrentPoints } = await fetch(`/api/points?${params}`).then(r => r.json());
 
     hintSections[currentHint].hidden.classList.add('hidden');
     hintSections[currentHint].hint.classList.remove('hidden');
@@ -334,21 +322,21 @@ async function NextHint() {
     currentHint++;
 
     setTextIfElementExists('hints-revealed', `${currentHint} / 5 Revealed`);
-
-    if (currentHint === 3) {
-        UpdateLettersHint();
-    }
-
-    const params = new URLSearchParams({
-        'user-guess': "",
-        'song-name': "",
-        'type': 1,
-        'current-hint': currentHint
-    });
-
-    const { CurrentPoints } = await fetch(`/api/points?${params}`).then(r => r.json());
-
     setTextIfElementExists('current-points', CurrentPoints);
+
+    if (currentHint === 1) {
+        setTextIfElementExists('release-date', cachedReleaseDate);
+    } else if (currentHint === 2) {
+        setImageIfElementExists('album-cover', cachedAlbumCover);
+    } else if (currentHint === 3) {
+        UpdateLettersHint();
+    } else if (currentHint === 4) {
+        if (cachedIsSingle) {
+            setAlbumNameHint("This song is a single", true);
+        } else {
+            setAlbumNameHint(cachedAlbumName, false);
+        }
+    }
 }
 
 /**
@@ -403,14 +391,11 @@ async function UpdateLettersHint() {
 Plays a random 2 second audio snippet of the current song starting from snippetStartTime.
 */
 async function playSnippet() {
-    const { value } = await fetch('/api/song-details?argument=previewUrl').then(r => r.json());
-
-    if (!value) {
+    if (currentHint < 5 || !cachedPreviewUrl) {
         return;
     }
 
-    const audio = new Audio(value);
-
+    const audio = new Audio(cachedPreviewUrl);
     audio.currentTime = snippetStartTime;
     audio.play();
 
