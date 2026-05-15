@@ -1,3 +1,8 @@
+/*
+Gets the main elements from the select artists page.
+These are used later to update the search box, selected artists list,
+buttons, messages, and the hidden input that is sent to Flask.
+*/
 const searchResults = document.getElementById("searchResults");
 const searchResultsWrap = document.getElementById("searchResultsWrap");
 const selectedArtists = document.getElementById("selectedArtists");
@@ -12,15 +17,26 @@ const selectArtistsForm = document.getElementById("selectArtistsForm");
 const selectedArtistsJson = document.getElementById("selectedArtistsJson");
 const initialSelectedArtistsScript = document.getElementById("initialSelectedArtists");
 
+/*
+Gets the maximum number of artists from the HTML form.
+The fallback image is used when an artist does not have a proper image.
+*/
 const MAX_SELECTED_ARTISTS = Number(selectArtistsForm.dataset.maxArtists);
 const FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 
+/*
+Stores the artists selected by the user on the page before the form is submitted.
+*/
 const chosenArtists = [];
 
 let searchTimer = null;
 let activeSearchController = null;
 let latestSearchId = 0;
 
+/*
+Escapes text before putting it into HTML.
+This helps stop artist names with special characters from breaking the page layout.
+*/
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -30,6 +46,9 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+/*
+Returns the default image used when an artist image is missing.
+*/
 function getFallbackImage() {
   return FALLBACK_ARTIST_IMAGE;
 }
@@ -58,12 +77,20 @@ function hideSearchResults() {
   searchResults.innerHTML = "";
 }
 
+/*
+If an artist image fails to load, replace it with the fallback placeholder image.
+*/
 function handleBrokenArtistImage(imageElement) {
   imageElement.addEventListener("error", function () {
     imageElement.src = FALLBACK_ARTIST_IMAGE;
   });
 }
 
+/*
+Loads artists that were already saved for the current user.
+Flask puts the saved artist data into the page, and this function adds it back
+into chosenArtists so the page can show the selected artists again.
+*/
 function loadInitialSelectedArtists() {
   try {
     const savedArtists = JSON.parse(initialSelectedArtistsScript.textContent || "[]");
@@ -96,18 +123,34 @@ function loadInitialSelectedArtists() {
   }
 }
 
+/*
+Updates the hidden input with the selected artists as JSON.
+This is how the selected artists are sent to the Flask route when the form submits.
+*/
 function updateHiddenSelectedArtistsInput() {
   selectedArtistsJson.value = JSON.stringify(chosenArtists);
 }
 
+/*
+Checks if the artist is already selected.
+This prevents the same artist from being selected twice.
+*/
 function isAlreadySelected(artistId) {
   return chosenArtists.some((artist) => String(artist.id) === String(artistId));
 }
 
+/*
+Checks if the user has already selected the maximum number of artists.
+*/
 function hasReachedArtistLimit() {
   return chosenArtists.length >= MAX_SELECTED_ARTISTS;
 }
 
+/*
+Updates the save button, clear button, selected artist count, and warning messages.
+The page changes depending on whether the user has selected no artists, some artists,
+or the maximum number of artists.
+*/
 function updateSaveButton() {
   selectedArtistsSummary.textContent = `${chosenArtists.length} / ${MAX_SELECTED_ARTISTS} selected`;
 
@@ -144,6 +187,10 @@ function updateSaveButton() {
   updateHiddenSelectedArtistsInput();
 }
 
+/*
+Displays the selected artists as chips on the page.
+Clicking a selected artist chip removes that artist from the selected list.
+*/
 function renderSelectedArtists() {
   selectedArtists.innerHTML = "";
 
@@ -204,6 +251,10 @@ function renderSelectedArtists() {
   updateSaveButton();
 }
 
+/*
+After an artist is selected, this tries to fetch a better image for that artist.
+If a better image is found, the selected artist chip is updated.
+*/
 async function fetchArtistImageAndUpdate(artistId) {
   try {
     const response = await fetch(`/api/artist-image-by-id?artist_id=${encodeURIComponent(artistId)}`);
@@ -224,6 +275,10 @@ async function fetchArtistImageAndUpdate(artistId) {
   }
 }
 
+/*
+Adds an artist to the selected list.
+It blocks duplicate artists and stops the user from going over the artist limit.
+*/
 function addArtist(artist) {
   if (isAlreadySelected(artist.id)) {
     hideSearchResults();
