@@ -19,6 +19,9 @@ function getPlayerName(player) {
   return String(player.name || "Unknown player");
 }
 
+/*
+Returns the filtered and sorted player list based on the current search input
+*/
 function getVisiblePlayers(searchInput) {
   const searchText = searchInput.value.toLowerCase();
 
@@ -41,6 +44,9 @@ function getVisiblePlayers(searchInput) {
   return filteredPlayers;
 }
 
+/* 
+Returns a copy of all players sorted by points in descending order, used for the podium. 
+*/
 function getGlobalTopPlayers() {
   const globalPlayers = [...players];
 
@@ -51,6 +57,9 @@ function getGlobalTopPlayers() {
   return globalPlayers;
 }
 
+/* 
+Updates the four summary stat boxes above the leaderboard 
+*/
 function updateStats(playerList, elements) {
   if (playerList.length === 0) {
     elements.totalPlayersStat.textContent = "0";
@@ -76,6 +85,9 @@ function updateStats(playerList, elements) {
   elements.avgAccuracyStat.textContent = averageAccuracy + "%";
 }
 
+/* 
+Renders the top 3 players as podium cards, always sorted by points 
+*/
 function updatePodium(playerList, podiumSection) {
   const topThree = playerList.slice(0, 3);
   podiumSection.innerHTML = "";
@@ -106,6 +118,9 @@ function updatePodium(playerList, podiumSection) {
   });
 }
 
+/*
+Shows the user's own stats panel and shows a sign in prompt if no user is logged in
+*/
 function updatePlayerDetail(playerList, playerDetail) {
   if (playerList.length === 0) {
     playerDetail.innerHTML = `<p class="text-sm text-white/60">No players found.</p>`;
