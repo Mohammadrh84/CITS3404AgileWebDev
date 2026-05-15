@@ -2,10 +2,17 @@ let players = [];
 let currentSort = "points";
 var Current_Username = null;
 
+/*
+Formats numbers so large scores are easier to read on the leaderboard.
+*/
 function formatNumber(number) {
   return Number(number || 0).toLocaleString();
 }
 
+/*
+Escapes player names before adding them into HTML.
+This helps prevent names with special characters from breaking the page.
+*/
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -15,12 +22,16 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+/*
+Gets the player's display name.
+If the name is missing, a default name is shown instead.
+*/
 function getPlayerName(player) {
   return String(player.name || "Unknown player");
 }
 
 /*
-Returns the filtered and sorted player list based on the current search input
+Filters players by the search box and sorts them using the selected sort option.
 */
 function getVisiblePlayers(searchInput) {
   const searchText = searchInput.value.toLowerCase();
@@ -44,8 +55,9 @@ function getVisiblePlayers(searchInput) {
   return filteredPlayers;
 }
 
-/* 
-Returns a copy of all players sorted by points in descending order, used for the podium. 
+/*
+Returns all players sorted by points.
+This is used for the podium so the top 3 are always based on score.
 */
 function getGlobalTopPlayers() {
   const globalPlayers = [...players];
@@ -57,8 +69,8 @@ function getGlobalTopPlayers() {
   return globalPlayers;
 }
 
-/* 
-Updates the four summary stat boxes above the leaderboard 
+/*
+Updates the summary boxes above the leaderboard.
 */
 function updateStats(playerList, elements) {
   if (playerList.length === 0) {
@@ -85,8 +97,8 @@ function updateStats(playerList, elements) {
   elements.avgAccuracyStat.textContent = averageAccuracy + "%";
 }
 
-/* 
-Renders the top 3 players as podium cards, always sorted by points 
+/*
+Displays the top 3 players as podium cards.
 */
 function updatePodium(playerList, podiumSection) {
   const topThree = playerList.slice(0, 3);
@@ -119,7 +131,8 @@ function updatePodium(playerList, podiumSection) {
 }
 
 /*
-Shows the user's own stats panel and shows a sign in prompt if no user is logged in
+Shows the current user's leaderboard stats.
+If the current user is not found in the leaderboard data, a sign-in message is shown.
 */
 function updatePlayerDetail(playerList, playerDetail) {
   if (playerList.length === 0) {
@@ -152,6 +165,9 @@ function updatePlayerDetail(playerList, playerDetail) {
   `;
 }
 
+/*
+Renders the desktop leaderboard table.
+*/
 function updateTable(playerList, tableBody) {
   tableBody.innerHTML = "";
 
@@ -186,6 +202,9 @@ function updateTable(playerList, tableBody) {
   });
 }
 
+/*
+Renders the mobile leaderboard cards.
+*/
 function updateCards(playerList, cardsContainer) {
   cardsContainer.innerHTML = "";
 
@@ -215,6 +234,9 @@ function updateCards(playerList, cardsContainer) {
   });
 }
 
+/*
+Updates all leaderboard sections using the latest player list.
+*/
 function renderLeaderboard(elements) {
   const visiblePlayers = getVisiblePlayers(elements.searchInput);
   const globalTopPlayers = getGlobalTopPlayers();
@@ -226,6 +248,9 @@ function renderLeaderboard(elements) {
   updateCards(visiblePlayers, elements.cardsContainer);
 }
 
+/*
+Loads leaderboard data and the current logged-in user from the backend.
+*/
 async function loadLeaderboard(elements) {
   try {
     const response = await fetch('/api/leaderboard');
@@ -247,6 +272,10 @@ async function loadLeaderboard(elements) {
   }
 }
 
+/*
+Sets up the leaderboard page after it loads.
+Search and sort changes re-render the leaderboard.
+*/
 document.addEventListener("DOMContentLoaded", function () {
   const elements = {
     totalPlayersStat: document.getElementById("totalPlayersStat"),
