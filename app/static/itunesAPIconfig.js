@@ -175,7 +175,7 @@ async function GetRandomSong() {
     setTextIfElementExists('artist-name', cacheArtistName);
     listOfSongNames = songDeets.songNames || [];
 
-    if (songDeets.pointsDisabled) {
+    if (listOfSongNames.length < 10) {
         const container = document.getElementById('small-artist-warning');
         const p = document.createElement('p');
         p.textContent = "This artist has less than 10 songs. To maintain fairness, songs from this artist will not award points!";
