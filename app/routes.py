@@ -11,10 +11,11 @@ from .models import db, User, Game, Stats, SelectedArtist
 
 bp = Blueprint('main', __name__)
 
+# provide link for image if artist image cant be found, and specify the max artists that can be chosen
 FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
 MAX_SELECTED_ARTISTS = 10
 
-
+# basic page routes
 @bp.route('/')
 def welcome():
     return render_template('welcome.html')
@@ -34,8 +35,8 @@ def leaderboard():
 def how_to_play():
     return render_template('how_to_play.html')
 
-
 def get_artist_image_from_itunes(artist_id):
+    # get relevant information from the apple music API
     try:
         response = requests.get(
             "https://itunes.apple.com/lookup",
@@ -51,7 +52,7 @@ def get_artist_image_from_itunes(artist_id):
 
         for result in data.get("results", []):
             artwork_url = result.get("artworkUrl100")
-
+            # upscales image resolution
             if artwork_url:
                 return artwork_url.replace("100x100bb", "600x600bb")
 
@@ -94,6 +95,7 @@ def clean_selected_artist(artist):
     if not isinstance(artist, dict):
         return None
 
+    # make sure all artist information is properly formatted
     artist_id = str(artist.get("id", "")).strip()
     artist_name = str(artist.get("name", "")).strip()
     artist_image = str(artist.get("image", FALLBACK_ARTIST_IMAGE)).strip()
@@ -110,7 +112,7 @@ def clean_selected_artist(artist):
         "image": artist_image
     }
 
-
+# convert raw JSON into a list
 def parse_selected_artists(raw_selected_artists):
     try:
         artists = json.loads(raw_selected_artists)
@@ -134,7 +136,7 @@ def parse_selected_artists(raw_selected_artists):
         # reject invalid ids
         if artist_id is None:
             continue
-
+        # rejects duplicate ids
         if artist_id in seen_artist_ids:
             continue
 
@@ -146,7 +148,7 @@ def parse_selected_artists(raw_selected_artists):
 
     return selected_artists
 
-
+# retrieve selected artists from the current user
 def get_saved_selected_artists_for_current_user():
     saved_artists = (
         SelectedArtist.query
@@ -157,7 +159,7 @@ def get_saved_selected_artists_for_current_user():
 
     return [artist.to_dict() for artist in saved_artists]
 
-
+# deletes old selected artists and saves new ones
 def replace_saved_selected_artists_for_current_user(selected_artists):
     SelectedArtist.query.filter_by(user_id=current_user.id).delete()
 
@@ -173,11 +175,12 @@ def replace_saved_selected_artists_for_current_user(selected_artists):
 
     db.session.commit()
 
-
+# call the itunes API to search for artists (for autocomplete)
 @bp.route('/api/search-artists')
 def search_artists():
+    # read the user search term
     search_term = request.args.get('term', '').strip()
-
+    # if no corresponding artists return blank
     if len(search_term) == 0:
         return jsonify([])
 
@@ -309,10 +312,11 @@ def get_songs():
 
     return jsonify(names)
 
-
+# choose a random song from the selected artist for the user to guess
 @bp.route('/api/random-song')
 @login_required
 def random_song():
+    # starts by resetting all relevant variables for a new game (not a full reset)
     session['letters_correct'] = []
     session['letters_wrong'] = []
     session['current_points'] = 100
@@ -327,6 +331,7 @@ def random_song():
     if not artist_id:
         return jsonify({"error": "No artist found."}), 404
 
+    # fetch top 200 songs from the specified artist
     try:
         response = requests.get(
             "https://itunes.apple.com/lookup",
@@ -344,7 +349,7 @@ def random_song():
         return jsonify({"error": "Could not load songs."}), 500
 
     songs = []
-
+    # make sure song fits criteria
     for song in results:
         if is_valid_song(song, artist_id):
             songs.append(song)
@@ -365,6 +370,7 @@ def song_details():
         "value": session.get('random_song_details', {}).get(argument)
     })
 
+# counts the number of songs in a specified album
 @bp.route('/api/album-track-count')
 @login_required
 def album_track_count():
@@ -396,6 +402,7 @@ def album_track_count():
     
     return jsonify({"trackCount": track_count})
 
+# uses the audioDB api to get artist images and genre
 @bp.route('/api/artist-image')
 def artist_image():
     artist = request.args.get('artist')
@@ -427,7 +434,7 @@ def is_valid_song(song, artist_id):
         and "remix" not in song.get('trackName', '').lower()
     )
 
-
+# filters out invalid songs, removing remixes, demos, live tracks, unneccessary whitespace
 def filter_song_name(name):
     while '(' in name and ')' in name:
         start = name.find('(')
@@ -449,7 +456,7 @@ def filter_song_name(name):
 
     return name.strip()
 
-
+# checks what letters have been guessed by the user so far in their guesses
 @bp.route('/api/check-letters')
 @login_required
 def check_Letters():
@@ -464,6 +471,7 @@ def check_Letters():
     letters_correct = session.get('letters_correct', [])
     letters_wrong = session.get('letters_wrong', [])
 
+    # if the letter is in the song name, add it to correct letters, and if not add it to incorrect
     for letter in filtered_guess:
         if letter in filtered_song_name:
             if letter not in letters_correct:
@@ -480,7 +488,7 @@ def check_Letters():
         "wrong": letters_wrong
     })
 
-
+# returns correct correct and incorrect letters guessed by the user against the song name
 @bp.route('/api/current-letters')
 @login_required
 def Send_current_letters():
@@ -490,6 +498,7 @@ def Send_current_letters():
     })
 
 
+# handles scoring system
 @bp.route('/api/points')
 @login_required
 def calculate_points():
@@ -508,6 +517,8 @@ def calculate_points():
             "GameStatus": user_guess == song_name and user_guess != "" and song_name != ""
         })
 
+    # checks what hint the user is on and removes points for each one
+    # incrementally removes more points based on how many hints used
     if type_of_points == 0:
         current_points -= 3
     elif type_of_points == 1:
@@ -527,6 +538,7 @@ def calculate_points():
     session['current_points'] = current_points
     session['num_guesses'] = num_guesses
 
+    # as long as user hasnt exceeded guess limit and is still in guess game they can continue
     if num_guesses <= 15 and user_guess == song_name and user_guess != "" and song_name != "":
         return jsonify({
             "CurrentPoints": current_points,
@@ -534,6 +546,7 @@ def calculate_points():
             "GuessStatus": True
         })
 
+    # make sure user has not run out of points
     if current_points <= 0:
         return jsonify({
             "CurrentPoints": current_points,
@@ -546,14 +559,14 @@ def calculate_points():
         "GuessStatus": False
     })
 
-
+# function for properly converting values to integers
 def safe_int(value, default=0):
     try:
         return int(value)
     except (TypeError, ValueError):
         return default
 
-
+# calculate streaks based on consecutive wins, stops on loss
 def calculate_current_streak(user_id):
     games = (
         Game.query
@@ -575,6 +588,7 @@ def calculate_current_streak(user_id):
 
 @bp.route('/api/save-score', methods=['POST'])
 @login_required
+# score does not count if the artist does not have enough tracks
 def save_score():
     if session.get('points_disabled'):
         return jsonify({"message": "Small artist. Score not affected."}), 200
@@ -590,6 +604,7 @@ def save_score():
 
     score = client_score
 
+    # make sure user cannot cheat and points are consistent with server
     if score > server_points:
         score = server_points
 
@@ -627,8 +642,6 @@ def save_score():
         )
         db.session.add(stats)
 
-    games_played = stats.games_played
-
     correct_games = (
         Game.query
         .filter_by(user_id=current_user.id, correct=True)
@@ -650,7 +663,6 @@ def save_score():
     current_streak = calculate_current_streak(current_user.id)
 
     stats.total_points = int(total_points or 0)
-    #stats.games_played = games_played
     stats.accuracy = correct_games / stats.games_played if stats.games_played > 0 else 0
     stats.avg_hints = float(avg_hints or 0)
     stats.current_streak = current_streak
@@ -695,6 +707,7 @@ def leaderboard_data():
 
     return jsonify(leaderboard)
 
+# hard reset the game information
 @bp.route('/api/reset')
 @login_required
 def reset_game():

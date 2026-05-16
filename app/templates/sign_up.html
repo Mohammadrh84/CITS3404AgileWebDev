@@ -45,7 +45,10 @@
 
             <div>
                 {{ form.confirm.label(class="text-md tracking-[0.5px] mb-2 block") }}
-                {{ form.confirm(class="w-full bg-input-gray text-white border mb-[5vh] border-input-border-gray focus:outline-none focus:ring focus:ring-neon-green focus:ring-opacity-30 focus:border-neon-green py-2 px-4 rounded-full placeholder:text-placeholder-gray", placeholder="•••••••••••") }}
+                {{ form.confirm(class="w-full bg-input-gray text-white border border-input-border-gray focus:outline-none focus:ring focus:ring-neon-green focus:ring-opacity-30 focus:border-neon-green py-2 px-4 rounded-full placeholder:text-placeholder-gray", placeholder="•••••••••••") }}
+            </div>
+            <div>
+                <h6 class="text-xs text-gray-400 text-center mb-[5vh]">Password must be at least 8 characters, include a letter, a number and a special character.</h6>
             </div>
 
             <div class="text-center">

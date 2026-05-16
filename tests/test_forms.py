@@ -10,6 +10,7 @@ class TestForms(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
 
+    # ensure a password following the validators passes
     def test_signup_form_accepts_valid_data(self):
         with self.app.test_request_context():
             form = SignupForm(
@@ -20,7 +21,8 @@ class TestForms(unittest.TestCase):
 
             self.assertTrue(form.validate())
 
-    def test_signup_form_rejects_short_username(self):
+    # ensure usernames that are too short are rejected
+    def test_short_username(self):
         with self.app.test_request_context():
             form = SignupForm(
                 username="user",
@@ -30,7 +32,8 @@ class TestForms(unittest.TestCase):
 
             self.assertFalse(form.validate())
 
-    def test_signup_form_rejects_short_password(self):
+    # make sure passwords too short are rejected
+    def test_short_password(self):
         with self.app.test_request_context():
             form = SignupForm(
                 username="user123",
@@ -40,7 +43,8 @@ class TestForms(unittest.TestCase):
 
             self.assertFalse(form.validate())
 
-    def test_signup_form_rejects_password_without_special_character(self):
+    # make sure it rejects if there are no special characters
+    def test_special_chars(self):
         with self.app.test_request_context():
             form = SignupForm(
                 username="user123",
@@ -50,7 +54,8 @@ class TestForms(unittest.TestCase):
 
             self.assertFalse(form.validate())
 
-    def test_signup_form_rejects_empty_username(self):
+    # make sure empty usernames are rejected
+    def test_empty_username(self):
         with self.app.test_request_context():
             form = SignupForm(
                 username="",
@@ -60,7 +65,8 @@ class TestForms(unittest.TestCase):
 
             self.assertFalse(form.validate())
 
-    def test_signup_form_rejects_mismatched_password_confirmation(self):
+    # make sure form rejects if two passwords are different
+    def test_mismatched_passwords(self):
         with self.app.test_request_context():
             form = SignupForm(
                 username="testuser",
@@ -70,6 +76,7 @@ class TestForms(unittest.TestCase):
 
             self.assertFalse(form.validate())
 
+    # make sure the login form accepts correct information
     def test_login_form_accepts_valid_data(self):
         with self.app.test_request_context():
             form = LoginForm(
@@ -79,7 +86,8 @@ class TestForms(unittest.TestCase):
 
             self.assertTrue(form.validate())
 
-    def test_login_form_rejects_empty_password(self):
+    # make sure the login form rejects an empty password
+    def test_empty_password(self):
         with self.app.test_request_context():
             form = LoginForm(
                 username="user123",
