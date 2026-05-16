@@ -1,3 +1,8 @@
+/*
+Gets the main elements from the select artists page.
+These are used later to update the search box, selected artists list,
+buttons, messages, and the hidden input that is sent to Flask.
+*/
 const searchResults = document.getElementById("searchResults");
 const searchResultsWrap = document.getElementById("searchResultsWrap");
 const selectedArtists = document.getElementById("selectedArtists");
@@ -12,15 +17,26 @@ const selectArtistsForm = document.getElementById("selectArtistsForm");
 const selectedArtistsJson = document.getElementById("selectedArtistsJson");
 const initialSelectedArtistsScript = document.getElementById("initialSelectedArtists");
 
+/*
+Gets the maximum number of artists from the HTML form.
+The fallback image is used when an artist does not have a proper image.
+*/
 const MAX_SELECTED_ARTISTS = Number(selectArtistsForm.dataset.maxArtists);
 const FALLBACK_ARTIST_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png";
 
+/*
+Stores the artists selected by the user on the page before the form is submitted.
+*/
 const chosenArtists = [];
 
 let searchTimer = null;
 let activeSearchController = null;
 let latestSearchId = 0;
 
+/*
+Escapes text before putting it into HTML.
+This helps stop artist names with special characters from breaking the page layout.
+*/
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -30,10 +46,17 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+/*
+Returns the default image used when an artist image is missing.
+*/
 function getFallbackImage() {
   return FALLBACK_ARTIST_IMAGE;
 }
 
+/*
+Stops the current search request and clears the search timer.
+This helps stop old search results from showing after the user keeps typing.
+*/
 function stopActiveSearch() {
   latestSearchId++;
 
@@ -48,22 +71,36 @@ function stopActiveSearch() {
   }
 }
 
+/*
+Shows the search results dropdown.
+*/
 function showSearchResults() {
   searchResultsWrap.classList.remove("hidden");
 }
 
+/*
+Hides the search results dropdown and clears the results.
+*/
 function hideSearchResults() {
   stopActiveSearch();
   searchResultsWrap.classList.add("hidden");
   searchResults.innerHTML = "";
 }
 
+/*
+If an artist image fails to load, replace it with the fallback placeholder image.
+*/
 function handleBrokenArtistImage(imageElement) {
   imageElement.addEventListener("error", function () {
     imageElement.src = FALLBACK_ARTIST_IMAGE;
   });
 }
 
+/*
+Loads artists that were already saved for the current user.
+Flask puts the saved artist data into the page, and this function adds it back
+into chosenArtists so the page can show the selected artists again.
+*/
 function loadInitialSelectedArtists() {
   try {
     const savedArtists = JSON.parse(initialSelectedArtistsScript.textContent || "[]");
@@ -96,18 +133,34 @@ function loadInitialSelectedArtists() {
   }
 }
 
+/*
+Updates the hidden input with the selected artists as JSON.
+This is how the selected artists are sent to the Flask route when the form submits.
+*/
 function updateHiddenSelectedArtistsInput() {
   selectedArtistsJson.value = JSON.stringify(chosenArtists);
 }
 
+/*
+Checks if the artist is already selected.
+This prevents the same artist from being selected twice.
+*/
 function isAlreadySelected(artistId) {
   return chosenArtists.some((artist) => String(artist.id) === String(artistId));
 }
 
+/*
+Checks if the user has already selected the maximum number of artists.
+*/
 function hasReachedArtistLimit() {
   return chosenArtists.length >= MAX_SELECTED_ARTISTS;
 }
 
+/*
+Updates the save button, clear button, selected artist count, and warning messages.
+The page changes depending on whether the user has selected no artists, some artists,
+or the maximum number of artists.
+*/
 function updateSaveButton() {
   selectedArtistsSummary.textContent = `${chosenArtists.length} / ${MAX_SELECTED_ARTISTS} selected`;
 
@@ -144,6 +197,10 @@ function updateSaveButton() {
   updateHiddenSelectedArtistsInput();
 }
 
+/*
+Displays the selected artists as chips on the page.
+Clicking a selected artist chip removes that artist from the selected list.
+*/
 function renderSelectedArtists() {
   selectedArtists.innerHTML = "";
 
@@ -204,6 +261,10 @@ function renderSelectedArtists() {
   updateSaveButton();
 }
 
+/*
+After an artist is selected, this tries to fetch a better image for that artist.
+If a better image is found, the selected artist chip is updated.
+*/
 async function fetchArtistImageAndUpdate(artistId) {
   try {
     const response = await fetch(`/api/artist-image-by-id?artist_id=${encodeURIComponent(artistId)}`);
@@ -224,6 +285,10 @@ async function fetchArtistImageAndUpdate(artistId) {
   }
 }
 
+/*
+Adds an artist to the selected list.
+It blocks duplicate artists and stops the user from going over the artist limit.
+*/
 function addArtist(artist) {
   if (isAlreadySelected(artist.id)) {
     hideSearchResults();
@@ -251,6 +316,10 @@ function addArtist(artist) {
   return true;
 }
 
+/*
+Shows a message inside the search dropdown.
+This is used for searching, no results, errors, and max artist limit messages.
+*/
 function renderSearchMessage(message, isError = false) {
   searchResults.innerHTML = `
     <li class="px-4 py-3 text-sm ${isError ? "text-red-400" : "text-white/60"} border-b border-white/5 last:border-0">
@@ -261,6 +330,11 @@ function renderSearchMessage(message, isError = false) {
   showSearchResults();
 }
 
+/*
+Renders the list of artists returned by the backend search route.
+It also shows whether each artist can be added, is already selected, or cannot be added
+because the max artist limit has been reached.
+*/
 function renderSearchResults(results, searchId, query) {
   if (searchId !== latestSearchId) {
     return;
@@ -329,6 +403,10 @@ function renderSearchResults(results, searchId, query) {
     const resultImage = item.querySelector("img");
     handleBrokenArtistImage(resultImage);
 
+    /*
+    Loads a better image for each artist result after the result is shown.
+    This keeps the search list fast while still improving the image when possible.
+    */
     fetch(`/api/artist-image-by-id?artist_id=${encodeURIComponent(artist.id)}`)
       .then((response) => response.json())
       .then((data) => {
@@ -359,6 +437,11 @@ function renderSearchResults(results, searchId, query) {
   showSearchResults();
 }
 
+/*
+Searches for artists using the backend artist search API.
+The search is cancelled and restarted when the user keeps typing,
+so old results do not appear after a newer search.
+*/
 async function searchArtistsFromAPI(query) {
   query = query.trim();
 
@@ -415,6 +498,10 @@ async function searchArtistsFromAPI(query) {
   }
 }
 
+/*
+Waits briefly after the user types before searching.
+This avoids sending a search request for every single key press.
+*/
 artistSearch.addEventListener("input", function (event) {
   const query = event.target.value;
 
@@ -427,12 +514,19 @@ artistSearch.addEventListener("input", function (event) {
   }, 150);
 });
 
+/*
+Closes the search dropdown when the user clicks outside the search input or results box.
+*/
 document.addEventListener("mousedown", function (event) {
   if (!artistSearch.contains(event.target) && !searchResultsWrap.contains(event.target)) {
     hideSearchResults();
   }
 });
 
+/*
+Checks the form before saving selected artists.
+The clear button skips validation because the user is allowed to clear all artists.
+*/
 selectArtistsForm.addEventListener("submit", function (event) {
   const clickedButton = event.submitter || document.activeElement;
 
@@ -449,6 +543,9 @@ selectArtistsForm.addEventListener("submit", function (event) {
   }
 });
 
+/*
+Hides temporary status messages after a short delay.
+*/
 setTimeout(function () {
   const messages = document.querySelectorAll(".status-message");
 
@@ -457,6 +554,10 @@ setTimeout(function () {
   });
 }, 2500);
 
+/*
+Initial page setup.
+Loads saved artists, displays them, and updates the buttons/messages.
+*/
 loadInitialSelectedArtists();
 renderSelectedArtists();
 updateSaveButton();
